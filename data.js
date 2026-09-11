@@ -56,7 +56,6 @@ const PARTS = [
     category: "diskebi",
     price: 2500,
     images: [
-      "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5h3p39.jpg",
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hssr4.jpg",
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hi8or.jpg",
     ],
