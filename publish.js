@@ -108,7 +108,15 @@ const GitHubPublisher = (() => {
     if (status === 409) {
       return "რეპოზიტორია შეიცვალა — გადატვირთე გვერდი და ისევ სცადე." + raw;
     }
-    if (status === 422) return "GitHub-მა უარყო მოთხოვნა." + raw;
+    if (status === 422) {
+      if (/fast forward/i.test(detail)) {
+        return (
+          "ბრენჩი შენახვის დროს შეიცვალა — სხვამ ამავე წამს შეინახა.\n\n" +
+          "ცვლილებები ბრაუზერში დარჩა. სცადე ხელახლა." + raw
+        );
+      }
+      return "GitHub-მა უარყო მოთხოვნა." + raw;
+    }
     return `GitHub: ${status}` + raw;
   }
 
@@ -142,6 +150,16 @@ const GitHubPublisher = (() => {
 
   // ── ერთი კომიტი ყველა ფაილზე ───────────────────────
   // files: [{ path, content, encoding }] — encoding: "utf-8" | "base64"
+  // data.js-ის blob sha — ასე ვიგებთ, კატალოგი შეიცვალა თუ არა
+  async function dataFileSha(base, treeSha, token) {
+    const tree = await api(`${base}/git/trees/${treeSha}`, { token });
+    const entry = (tree.tree || []).find((t) => t.path === "data.js");
+    return entry ? entry.sha : null;
+  }
+
+  const isNotFastForward = (err) =>
+    err.status === 422 && /fast forward/i.test(err.message || "");
+
   async function publish({ files, message }, onProgress = () => {}) {
     const { owner, repo, branch, token } = getConfig();
     if (!token) throw new Error("ჯერ შეიყვანე თოკენი „კავშირი“ ჩანართში");
@@ -149,14 +167,8 @@ const GitHubPublisher = (() => {
 
     const base = `/repos/${owner}/${repo}`;
 
-    onProgress("ბრენჩის მოძებნა…");
-    const ref = await api(`${base}/git/ref/heads/${branch}`, { token });
-    const headSha = ref.object.sha;
-
-    const headCommit = await api(`${base}/git/commits/${headSha}`, { token });
-    const baseTreeSha = headCommit.tree.sha;
-
-    // თითოეული ფაილი ცალკე blob-ად — ასე ორობითი ფოტოებიც გადის
+    // blob-ები შიგთავსით ინდექსირდება, ამიტომ ერთხელ აიტვირთება და
+    // ხელახალ ცდაზე აღარ სჭირდება თავიდან გაგზავნა
     const tree = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -169,30 +181,64 @@ const GitHubPublisher = (() => {
       tree.push({ path: file.path, mode: "100644", type: "blob", sha: blob.sha });
     }
 
-    onProgress("კომიტის შექმნა…");
-    const newTree = await api(`${base}/git/trees`, {
-      method: "POST",
-      token,
-      body: { base_tree: baseTreeSha, tree },
-    });
+    // ბრენჩი შეიძლება შენახვის შუაში შეიცვალოს (სხვამ შეინახა). ასეთ
+    // დროს ხელახლა ვცდით — ოღონდ მხოლოდ მაშინ, თუ data.js არ შეცვლილა,
+    // თორემ სხვისი ცვლილებები ჩუმად წაიშლებოდა.
+    let seenDataSha;
 
-    const commit = await api(`${base}/git/commits`, {
-      method: "POST",
-      token,
-      body: { message, tree: newTree.sha, parents: [headSha] },
-    });
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      onProgress(attempt === 1 ? "ბრენჩის მოძებნა…" : "ბრენჩი შეიცვალა — ვცდი თავიდან…");
 
-    onProgress("ბრენჩის განახლება…");
-    await api(`${base}/git/refs/heads/${branch}`, {
-      method: "PATCH",
-      token,
-      body: { sha: commit.sha, force: false },
-    });
+      const ref = await api(`${base}/git/ref/heads/${branch}`, { token });
+      const headSha = ref.object.sha;
+      const headCommit = await api(`${base}/git/commits/${headSha}`, { token });
+      const baseTreeSha = headCommit.tree.sha;
+      const dataSha = await dataFileSha(base, baseTreeSha, token);
 
-    return {
-      sha: commit.sha,
-      url: `https://github.com/${owner}/${repo}/commit/${commit.sha}`,
-    };
+      if (seenDataSha === undefined) {
+        seenDataSha = dataSha;
+      } else if (dataSha !== seenDataSha) {
+        throw new Error(
+          "სხვამ შენს პარალელურად შეცვალა კატალოგი.\n\n" +
+          "შენი ცვლილებები ბრაუზერში დარჩა, მაგრამ შენახვა მათ " +
+          "ცვლილებებს წაშლიდა.\n\n" +
+          "დააჭირე „data.js“ და დააკოპირე შენი ვერსია, შემდეგ " +
+          "„თავიდან ჩატვირთვა“ და ხელახლა შეიტანე ცვლილებები."
+        );
+      }
+
+      onProgress("კომიტის შექმნა…");
+      const newTree = await api(`${base}/git/trees`, {
+        method: "POST",
+        token,
+        body: { base_tree: baseTreeSha, tree },
+      });
+
+      const commit = await api(`${base}/git/commits`, {
+        method: "POST",
+        token,
+        body: { message, tree: newTree.sha, parents: [headSha] },
+      });
+
+      onProgress("ბრენჩის განახლება…");
+      try {
+        await api(`${base}/git/refs/heads/${branch}`, {
+          method: "PATCH",
+          token,
+          body: { sha: commit.sha, force: false },
+        });
+      } catch (err) {
+        if (isNotFastForward(err) && attempt < 3) continue; // ვიღაცამ გაგვასწრო
+        throw err;
+      }
+
+      return {
+        sha: commit.sha,
+        url: `https://github.com/${owner}/${repo}/commit/${commit.sha}`,
+      };
+    }
+
+    throw new Error("ბრენჩი მუდმივად იცვლება — სცადე ერთი წუთის შემდეგ");
   }
 
   // ── დამხმარეები ────────────────────────────────────
