@@ -11,14 +11,16 @@ const SITE = {
 
 // მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)
 const SLIDES = [
-
+  {
+    image: "images/slide-mtxlzsjfafj2.jpg",
+    title: "",
+    link: "",
+  },
 ];
 
 const CATEGORIES = [
   { id: "dzrava", name: "ძრავი", image: "" },
   { id: "muxruchi", name: "სამუხრუჭე სისტემა", image: "" },
-  { id: "sakidari", name: "საკიდარი", image: "" },
-  { id: "eleqtro", name: "ელექტრო", image: "" },
   { id: "filtri", name: "ფილტრები", image: "" },
   { id: "saburavi", name: "საბურავები და დისკები", image: "" },
   { id: "zeti", name: "ზეთები და სითხეები", image: "" },
@@ -86,7 +88,7 @@ const PARTS = [
   },
   {
     name: "5964 BMW 5X120 R19",
-    category: "dzrava",
+    category: "diskebi",
     price: 2900,
     sale: 2500,
     images: [
