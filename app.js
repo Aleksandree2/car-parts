@@ -10,7 +10,7 @@ const emptyEl  = document.getElementById("empty");
 // ფერები თემას მიჰყვება, თორემ მუქ ფონზე თეთრი ლაქა გამოჩნდება.
 function placeholder() {
   const dark =
-    (window.Theme ? window.Theme.current() : "light") === "dark";
+    (window.Theme ? window.Theme.current() : "dark") === "dark";
   const bg = dark ? "#23272f" : "#eef0f3";
   const mark = dark ? "#4d545f" : "#b9bec7";
   const text = dark ? "#6b727e" : "#9aa0aa";

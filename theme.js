@@ -1,10 +1,11 @@
 // ნათელი / მუქი თემა.
 //
-// სამი მდგომარეობაა: ხელით ნათელი, ხელით მუქი და — თუ არჩევანი არ
-// გაუკეთებია — სისტემისა. არჩევანი ინახება ბრაუზერში.
+// საიტი ნაგულისხმევად მუქია და სისტემის არჩევანს არ მიჰყვება.
+// ზედა ღილაკით შეიძლება ნათელზე გადართვა; არჩევანი ბრაუზერში ინახება
+// და ორივე გვერდზე მოქმედებს.
 //
-// ეს ფაილი <head>-ის ბოლოს უნდა ჩაიტვირთოს, სანამ გვერდი დაიხატება,
-// თორემ მუქ თემაზე ჯერ ნათელი გაიელვებს.
+// ეს ფაილი <head>-ში იტვირთება, სანამ გვერდი დაიხატება, რომ თემამ
+// არ გაიელვოს.
 
 (function () {
   const KEY = "carparts:theme";
@@ -12,25 +13,24 @@
   function stored() {
     try {
       const v = localStorage.getItem(KEY);
-      return v === "dark" || v === "light" ? v : null;
+      return v === "light" || v === "dark" ? v : null;
     } catch (e) {
       return null; // localStorage მიუწვდომელია (private mode და მისთ.)
     }
   }
 
-  const systemDark = () =>
-    window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-  // რა თემა ჩანს ეკრანზე ახლა
-  const current = () => stored() || (systemDark() ? "dark" : "light");
+  // არჩევანის გარეშე — მუქი
+  const current = () => stored() || "dark";
 
   function apply(theme) {
-    if (theme) document.documentElement.setAttribute("data-theme", theme);
-    else document.documentElement.removeAttribute("data-theme");
+    if (theme === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
   }
 
-  // არჩევანი მაშინვე, სანამ <body> დაიხატება
-  apply(stored());
+  apply(current());
 
   function toggle() {
     const next = current() === "dark" ? "light" : "dark";
@@ -44,7 +44,6 @@
     window.dispatchEvent(new CustomEvent("themechange", { detail: next }));
   }
 
-  // ღილაკის იერსახე მიმდინარე თემას მიჰყვება
   function sync() {
     const dark = current() === "dark";
     for (const btn of document.querySelectorAll("[data-theme-toggle]")) {
@@ -60,16 +59,6 @@
       btn.addEventListener("click", toggle);
     }
   });
-
-  // სისტემის თემა შეიცვალა და ხელით არჩევანი არ გვაქვს
-  if (window.matchMedia) {
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-      if (!stored()) {
-        sync();
-        window.dispatchEvent(new CustomEvent("themechange", { detail: current() }));
-      }
-    });
-  }
 
   window.Theme = { current, toggle };
 })();
