@@ -16,6 +16,11 @@ const SLIDES = [
     title: "წარწერაააა",
     link: "",
   },
+  {
+    image: "images/slide-mtxhtsmbsoyn.jpg",
+    title: "",
+    link: "",
+  },
 ];
 
 const CATEGORIES = [
