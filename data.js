@@ -12,7 +12,7 @@ const SITE = {
 // მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)
 const SLIDES = [
   {
-    image: "images/slide-mtxhn3887md9.jpg",
+    image: "images/slide-mtxhpgfbhb3p.jpg",
     title: "",
     link: "",
   },
