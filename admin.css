@@ -528,3 +528,11 @@
   color: var(--bar-ink);
   border-color: currentColor;
 }
+
+/* ── ლოგო ბექოფისის ზოლში ────────────────────────────── */
+.admin-logo .logo-img {
+  height: 30px;
+  max-width: 120px;
+  padding: 3px 6px;
+  border-radius: 7px;
+}

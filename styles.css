@@ -125,6 +125,28 @@ body {
   letter-spacing: -.2px;
 }
 
+/*
+  ლოგო შავფონიანი სურათია, ამიტომ მუდამ მუქ ფირფიტაზე ზის — ნათელ
+  თემაზეც განზრახულად გამოიყურება და არა შემთხვევით შავ მართკუთხედად.
+*/
+.logo-img {
+  height: 68px;
+  width: auto;
+  max-width: 240px;
+  display: block;
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: #000;
+  object-fit: contain;
+}
+
+/* სურათის ჩატვირთვის შემდეგ სათადარიგო ხატულა და ტექსტი იმალება */
+.logo.has-logo .logo-mark,
+.logo.has-logo #site-title,
+.admin-logo.has-logo .logo-mark {
+  display: none;
+}
+
 .logo-mark {
   display: grid;
   place-items: center;
@@ -353,4 +375,5 @@ body {
 @media (max-width: 520px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
   .logo { font-size: 19px; }
+  .logo-img { height: 52px; max-width: 170px; }
 }
