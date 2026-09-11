@@ -28,6 +28,7 @@ const categoryName = (id) =>
 if (typeof SITE === "object" && SITE) {
   if (SITE.title) {
     document.getElementById("site-title").textContent = SITE.title;
+    document.getElementById("site-title-footer").textContent = SITE.title;
     document.title = SITE.title;
   }
   document.getElementById("site-tagline").textContent = SITE.tagline || "";

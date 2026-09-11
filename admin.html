@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ბექოფისი — ავტონაწილები</title>
+  <title>ბექოფისი — AutoZona.ge</title>
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +19,7 @@
       <span class="admin-status" id="status"></span>
       <div class="admin-actions">
         <a class="btn btn-ghost" href="./" target="_blank" rel="noopener">საიტის ნახვა ↗</a>
+        <button class="btn btn-ghost" type="button" id="reload">თავიდან ჩატვირთვა</button>
         <button class="btn btn-ghost" type="button" id="export">data.js</button>
         <button class="btn btn-primary" type="button" id="save">შენახვა საიტზე</button>
       </div>
@@ -41,12 +42,14 @@
 
       <div class="field">
         <label for="site-title">სათაური</label>
-        <input type="text" id="site-title" maxlength="60" placeholder="ავტონაწილები">
+        <input type="text" id="site-title" maxlength="60" autocomplete="off"
+               placeholder="ავტონაწილები">
       </div>
 
       <div class="field">
         <label for="site-tagline">ქვესათაური</label>
-        <input type="text" id="site-tagline" maxlength="80" placeholder="ნაწილების კატალოგი">
+        <input type="text" id="site-tagline" maxlength="80" autocomplete="off"
+               placeholder="ნაწილების კატალოგი">
       </div>
     </section>
 
@@ -121,15 +124,15 @@
       <div class="field-row">
         <div class="field">
           <label for="gh-owner">Owner</label>
-          <input type="text" id="gh-owner" spellcheck="false" placeholder="Aleksandree2">
+          <input type="text" id="gh-owner" spellcheck="false" autocomplete="off" placeholder="Aleksandree2">
         </div>
         <div class="field">
           <label for="gh-repo">Repository</label>
-          <input type="text" id="gh-repo" spellcheck="false" placeholder="car-parts">
+          <input type="text" id="gh-repo" spellcheck="false" autocomplete="off" placeholder="car-parts">
         </div>
         <div class="field">
           <label for="gh-branch">Branch</label>
-          <input type="text" id="gh-branch" spellcheck="false" placeholder="main">
+          <input type="text" id="gh-branch" spellcheck="false" autocomplete="off" placeholder="main">
         </div>
       </div>
 
