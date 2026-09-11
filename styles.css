@@ -108,7 +108,7 @@ body {
 
 .header-inner {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 14px;
   flex-wrap: wrap;
   padding-block: 18px;
@@ -129,8 +129,12 @@ body {
   ლოგო შავფონიანი სურათია, ამიტომ მუდამ მუქ ფირფიტაზე ზის — ნათელ
   თემაზეც განზრახულად გამოიყურება და არა შემთხვევით შავ მართკუთხედად.
 */
+/* hidden ატრიბუტი display: block-ს უნდა სძლევდეს, თორემ ლოგოს
+   ცარიელი შავი ფირფიტა ჩანს სანამ სურათი ჩაიტვირთება */
+.logo-img[hidden] { display: none; }
+
 .logo-img {
-  height: 68px;
+  height: 84px;
   width: auto;
   max-width: 240px;
   display: block;
@@ -375,5 +379,5 @@ body {
 @media (max-width: 520px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
   .logo { font-size: 19px; }
-  .logo-img { height: 52px; max-width: 170px; }
+  .logo-img { height: 62px; max-width: 180px; }
 }
