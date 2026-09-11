@@ -1,8 +1,7 @@
 // ავტონაწილების მონაცემები
 // ────────────────────────────────────────────────────────────
-// ახალი ნაწილის დასამატებლად უბრალოდ დაამატე ახალი ბლოკი parts-ის სიაში.
-// სურათი ჩააგდე images/ საქაღალდეში და მიუთითე მისი სახელი image-ში.
-// თუ სურათი არ არსებობს, ავტომატურად ჩაანაცვლებს placeholder-ით.
+// ეს ფაილი დაგენერირდა ბექოფისიდან (admin.html).
+// ხელით რედაქტირებაც შეიძლება, ოღონდ სტრუქტურა შეინარჩუნე.
 
 // საიტის ზოგადი პარამეტრები
 const SITE = {
@@ -19,30 +18,10 @@ const CATEGORIES = [
   { id: "saburavi", name: "საბურავები და დისკები", image: "" },
   { id: "zeti", name: "ზეთები და სითხეები", image: "" },
   { id: "dzara", name: "ძარა და ოპტიკა", image: "" },
+  { id: "alex", name: "alex", image: "" },
 ];
 
 const PARTS = [
-  {
-    name: "ცილინდრის თავის შუასადები",
-    category: "dzrava",
-    price: 85,
-    image: "images/head-gasket.jpg",
-    description: "მაღალტემპერატურული შუასადები, 1.6–2.0 ბენზინის ძრავებისთვის",
-  },
-  {
-    name: "ღვედის კომპლექტი (ГРМ)",
-    category: "dzrava",
-    price: 210,
-    image: "images/timing-belt.jpg",
-    description: "სრული კომპლექტი ტკიპებითა და დამჭიმით",
-  },
-  {
-    name: "ანთების სანთლები (4 ცალი)",
-    category: "dzrava",
-    price: 60,
-    image: "images/spark-plugs.jpg",
-    description: "ირიდიუმის სანთლები, გახანგრძლივებული რესურსი",
-  },
   {
     name: "სამუხრუჭე ხუნდები — წინა",
     category: "muxruchi",
@@ -175,5 +154,12 @@ const PARTS = [
     price: 280,
     image: "images/bumper.jpg",
     description: "დაუღებავი, სამღებროდ მზა",
+  },
+  {
+    name: "ძრავი",
+    category: "dzrava",
+    price: 1000,
+    image: "images/dzravi-mtww2smnaqi3.jpg",
+    description: "",
   },
 ];
