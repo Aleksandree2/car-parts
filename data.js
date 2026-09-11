@@ -27,21 +27,28 @@ const PARTS = [
     name: "RAYS 5113 Dark Gunmetal  R18",
     category: "diskebi",
     price: 2200,
-    image: "images/5113-lp95-r18-mtxewhmq0kzd.jpg",
+    images: [
+      "images/5113-lp95-r18-mtxewhmq0kzd.jpg",
+    ],
     description: "Size: 18x9.5 | Bolt Pattern: 10(114.3+120) | Offset: ET:12 | Finish: Dark Gunmetal / Lip Polish | Hub Bore: CB:73.1\nSize: 18x10.5 | Bolt Pattern: 10(114.3+120) | Offset: ET:15 | Finish: Dark Gunmetal",
   },
   {
     name: "RAYS 5113 Mat Bronze R18",
     category: "diskebi",
     price: 2200,
-    image: "images/rays-5113-mat-bronze-r18-mtxfohpvf2oj.jpg",
+    images: [
+      "images/rays-5113-mat-bronze-r18-mtxfohpvf2oj.jpg",
+    ],
     description: "Size: 18x9.5 | Bolt Pattern: 10(114.3+120) | Offset: ET:12 | Finish: Mat Bronze / Lip Polish | Hub Bore: CB:73.1\n Size: 18x10.5 | Bolt Pattern: 10(114.3+120) | Offset: ET:15 | Finish: Mat Bronze",
   },
   {
     name: "XH657 R19 Mat Black",
     category: "diskebi",
     price: 2500,
-    image: "images/xh657-r19-mat-black-mtxg3ql4lybg.jpg",
+    images: [
+      "images/xh657-r19-mat-black-mtxg3ql4lybg.jpg",
+      "images/xh657-r19-mat-black-mtxg4dzex6g2.jpg",
+    ],
     description: "FR-XH657 19″ MATTE BLACK WITH LIP LINE ALLOY WHEELS FOR NISSAN GTR, FORD MUSTANG, DODGE CHALLENGER, DODGE CHARGER AND LEXUS GS\nSIZES: 19X9.5 & 19X11 \nPCD: 5X114.3 ET: 20 & 25 CB: 73.1 FINISH: MATT",
   },
 ];
