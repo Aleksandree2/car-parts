@@ -95,10 +95,16 @@ function render() {
     .map(
       (p) => `
       <article class="card">
-        <div class="card-media">
-          <img src="${p.image}" alt="${p.name}" loading="lazy"
-               onerror="this.onerror=null; this.src='${fallback}'">
-        </div>
+        ${p.image
+          ? `<button class="card-media is-zoomable" type="button"
+                     data-zoom="${p.image}" data-name="${p.name}"
+                     aria-label="${p.name} — სურათის გადიდება">
+               <img src="${p.image}" alt="${p.name}" loading="lazy"
+                    onerror="this.onerror=null; this.src='${fallback}'">
+             </button>`
+          : `<div class="card-media">
+               <img src="${fallback}" alt="" loading="lazy">
+             </div>`}
         <div class="card-body">
           <span class="card-cat">${categoryName(p.category)}</span>
           <h2 class="card-title">${p.name}</h2>
@@ -114,6 +120,34 @@ function render() {
     ? `ნაპოვნია ${visible.length} ნაწილი`
     : "";
 }
+
+
+// ── სურათის გადიდება ─────────────────────────────────
+// <dialog> Escape-სა და ფოკუსს თავად უვლის; ფონზე დაჭერას ვამოწმებთ.
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightbox-img");
+const lightboxCaption = document.getElementById("lightbox-caption");
+
+grid.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-zoom]");
+  if (!btn) return;
+  lightboxImg.src = btn.dataset.zoom;
+  lightboxImg.alt = btn.dataset.name || "";
+  lightboxCaption.textContent = btn.dataset.name || "";
+  lightbox.showModal();
+});
+
+document.getElementById("lightbox-close").addEventListener("click", () => lightbox.close());
+
+// ფონზე დაჭერით დახურვა — თავად სურათზე დაჭერამ არ უნდა დახუროს
+lightbox.addEventListener("click", (e) => {
+  if (e.target === lightbox) lightbox.close();
+});
+
+// დახურვისას src ვიცლით, რომ მეხსიერებაში დიდი სურათი არ დარჩეს
+lightbox.addEventListener("close", () => {
+  lightboxImg.removeAttribute("src");
+});
 
 window.addEventListener("themechange", render);
 
