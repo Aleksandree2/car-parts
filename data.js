@@ -29,10 +29,10 @@ const PARTS = [
     description: "კერამიკული ხუნდები, დაბალი ხმაური და მტვერი",
   },
   {
-    name: "სამუხრუჭე დისკი — წინა (წყვილი)",
+    name: "კესუნა",
     category: "muxruchi",
-    price: 180,
-    image: "images/brake-discs.jpg",
+    price: 1000000,
+    image: "images/kesuna-mtx8iz5ndmjs.jpg",
     description: "ვენტილირებადი დისკები, დიამეტრი 280 მმ",
   },
   {
