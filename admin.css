@@ -494,6 +494,9 @@
   margin: 16px 0 0;
   font-size: 14px;
   min-height: 20px;
+  white-space: pre-line;   /* შეცდომის ტექსტი მრავალსტრიქონიანია */
+  line-height: 1.65;
+  max-width: 560px;
 }
 
 .conn-result.ok { color: #1a7f43; }
@@ -506,8 +509,9 @@
   margin: 0 0 6px;
   font-size: 14.5px;
   color: var(--ink-soft);
-  line-height: 1.6;
+  line-height: 1.65;
   min-height: 46px;
+  white-space: pre-line;   /* შეცდომის ტექსტი მრავალსტრიქონიანია */
 }
 
 .save-step.ok { color: #1a7f43; font-weight: 600; }

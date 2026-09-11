@@ -67,18 +67,42 @@ const GitHubPublisher = (() => {
       } catch (e) {
         /* პასუხი JSON არ იყო */
       }
-      throw new Error(explain(res.status, detail));
+      const err = new Error(explain(res.status, detail));
+      err.status = res.status;
+      throw err;
     }
     return res.status === 204 ? null : res.json();
   }
 
+  // GitHub-ის ორიგინალი ტექსტი ყოველთვის თან ერთვის — მიზეზი მასშია
   function explain(status, detail) {
-    if (status === 401) return "თოკენი არასწორია ან ვადაგასულია";
-    if (status === 403) return "თოკენს ამ რეპოზიტორიაზე ჩაწერის უფლება არ აქვს";
-    if (status === 404) return "რეპოზიტორია ან ბრენჩი ვერ მოიძებნა (შეამოწმე owner/repo/branch და თოკენის წვდომა)";
-    if (status === 409) return "რეპოზიტორია შეიცვალა — გადატვირთე გვერდი და ისევ სცადე";
-    if (status === 422) return `GitHub-მა უარყო მოთხოვნა${detail ? " — " + detail : ""}`;
-    return `GitHub: ${status}${detail ? " — " + detail : ""}`;
+    const raw = detail ? `\n\nGitHub: ${detail}` : "";
+
+    if (status === 401) {
+      return "თოკენი არასწორია ან ვადაგასულია — შექმენი ახალი." + raw;
+    }
+    if (status === 403) {
+      return (
+        "თოკენს ჩაწერის უფლება არ აქვს.\n\n" +
+        "შეამოწმე თოკენის პარამეტრებში:\n" +
+        "• Repository access → Only select repositories → car-parts არჩეულია\n" +
+        "• Repository permissions → Contents → Read and write\n" +
+        "(მხოლოდ Read არ კმარა. classic თოკენს სჭირდება repo scope.)" +
+        raw
+      );
+    }
+    if (status === 404) {
+      return (
+        "რეპოზიტორია ან ბრენჩი ვერ მოიძებნა.\n\n" +
+        "შეამოწმე owner/repo/branch, და ისიც, რომ თოკენში სწორედ ეს " +
+        "რეპოზიტორიაა არჩეული." + raw
+      );
+    }
+    if (status === 409) {
+      return "რეპოზიტორია შეიცვალა — გადატვირთე გვერდი და ისევ სცადე." + raw;
+    }
+    if (status === 422) return "GitHub-მა უარყო მოთხოვნა." + raw;
+    return `GitHub: ${status}` + raw;
   }
 
   // ── კავშირის შემოწმება ─────────────────────────────
@@ -88,10 +112,24 @@ const GitHubPublisher = (() => {
     if (!owner || !repo) throw new Error("owner და repo სავალდებულოა");
 
     const info = await api(`/repos/${owner}/${repo}`, { token });
-    if (!info.permissions || !info.permissions.push) {
-      throw new Error("თოკენს ჩაწერის (write) უფლება არ აქვს");
-    }
     await api(`/repos/${owner}/${repo}/branches/${branch}`, { token });
+
+    // fine-grained თოკენზე permissions ანგარიშის უფლებებს აჩვენებს და არა
+    // თოკენისას, ამიტომ ჩაწერას ნამდვილად ვამოწმებთ: ref-ის განახლება
+    // იმავე sha-ზე არაფერს ცვლის, მაგრამ ჩაწერის უფლებას მოითხოვს.
+    const ref = await api(`/repos/${owner}/${repo}/git/ref/heads/${branch}`, { token });
+    try {
+      await api(`/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
+        method: "PATCH",
+        token,
+        body: { sha: ref.object.sha, force: false },
+      });
+    } catch (err) {
+      // მხოლოდ 401/403 ნიშნავს უფლების არქონას. სხვა პასუხი (მაგ. 422 —
+      // „ცვლილება არ არის") ნიშნავს, რომ ჩაწერამდე მივედით და ეს საკმარისია.
+      if (err.status === 401 || err.status === 403) throw err;
+    }
+
     return { full_name: info.full_name, private: info.private };
   }
 
