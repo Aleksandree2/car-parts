@@ -4,8 +4,8 @@
 
 /* ── ზედა ზოლი ───────────────────────────────────────── */
 .admin-bar {
-  background: #17181c;
-  color: #fff;
+  background: var(--bar);
+  color: var(--bar-ink);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -29,7 +29,7 @@
 
 .admin-status {
   font-size: 13px;
-  color: #9aa0aa;
+  color: var(--bar-ink-soft);
   flex: 1;
   min-width: 120px;
 }
@@ -54,15 +54,15 @@
   transition: background .15s, border-color .15s, color .15s;
 }
 
-.btn-primary { background: var(--brand); color: #fff; }
-.btn-primary:hover { background: #b81f1f; }
+.btn-primary { background: var(--brand); color: var(--on-brand); }
+.btn-primary:hover { background: var(--brand-hover); }
 
 .btn-soft {
   background: var(--brand-soft);
   color: var(--brand);
-  border-color: #f5d6d6;
+  border-color: var(--brand-soft-line);
 }
-.btn-soft:hover { background: #fbdede; }
+.btn-soft:hover { background: var(--brand-soft-hover); }
 
 .btn-ghost {
   background: transparent;
@@ -82,7 +82,7 @@
   color: var(--ink-soft);
   cursor: pointer;
 }
-.btn-icon:hover { border-color: #c9ccd4; color: var(--ink); }
+.btn-icon:hover { border-color: var(--line-hover); color: var(--ink); }
 .btn-icon:disabled { opacity: .3; cursor: not-allowed; }
 .btn-icon.danger:hover { border-color: var(--brand); color: var(--brand); }
 
@@ -204,11 +204,11 @@
   flex: none;
   border-radius: 8px;
   object-fit: cover;
-  background: #eef0f3;
+  background: var(--thumb);
   display: grid;
   place-items: center;
   font-size: 17px;
-  color: #b9bec7;
+  color: var(--thumb-ink);
   overflow: hidden;
 }
 
@@ -304,10 +304,10 @@
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 18px 50px rgba(16, 18, 24, .25);
+  box-shadow: var(--shadow-strong);
 }
 
-.dialog::backdrop { background: rgba(16, 18, 24, .45); }
+.dialog::backdrop { background: var(--overlay); }
 
 .dialog form { padding: 24px; }
 
@@ -337,12 +337,12 @@
   height: 78px;
   flex: none;
   border-radius: 9px;
-  background: #eef0f3;
+  background: var(--thumb);
   display: grid;
   place-items: center;
   overflow: hidden;
   font-size: 12px;
-  color: #9aa0aa;
+  color: var(--muted-ink);
   text-align: center;
 }
 
@@ -386,11 +386,11 @@
   bottom: 26px;
   transform: translateX(-50%);
   padding: 11px 20px;
-  background: #17181c;
-  color: #fff;
+  background: var(--bar);
+  color: var(--bar-ink);
   font-size: 14px;
   border-radius: 999px;
-  box-shadow: 0 8px 24px rgba(16, 18, 24, .25);
+  box-shadow: var(--shadow-strong);
   z-index: 50;
 }
 
@@ -442,12 +442,12 @@
 .notice {
   padding: 14px 16px;
   margin-bottom: 22px;
-  background: #fff8e6;
-  border: 1px solid #f0e0b0;
+  background: var(--notice-bg);
+  border: 1px solid var(--notice-line);
   border-radius: 10px;
   font-size: 13.5px;
   line-height: 1.6;
-  color: #6b5518;
+  color: var(--notice-ink);
   max-width: 560px;
 }
 
@@ -499,7 +499,7 @@
   max-width: 560px;
 }
 
-.conn-result.ok { color: #1a7f43; }
+.conn-result.ok { color: var(--ok); }
 .conn-result.bad { color: var(--brand); }
 
 /* ── შენახვის პროგრესი ───────────────────────────────── */
@@ -514,5 +514,17 @@
   white-space: pre-line;   /* შეცდომის ტექსტი მრავალსტრიქონიანია */
 }
 
-.save-step.ok { color: #1a7f43; font-weight: 600; }
+.save-step.ok { color: var(--ok); font-weight: 600; }
 .save-step.bad { color: var(--brand); }
+
+/* ── თემის ღილაკი მუქ ზოლში ──────────────────────────── */
+.theme-toggle-bar {
+  margin-inline-start: 0;
+  color: var(--bar-ink-soft);
+  border-color: currentColor;
+}
+
+.theme-toggle-bar:hover {
+  color: var(--bar-ink);
+  border-color: currentColor;
+}
