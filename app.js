@@ -24,6 +24,15 @@ const PLACEHOLDER =
 const categoryName = (id) =>
   (CATEGORIES.find((c) => c.id === id) || {}).name || id;
 
+// ── საიტის სათაური ───────────────────────────────────
+if (typeof SITE === "object" && SITE) {
+  if (SITE.title) {
+    document.getElementById("site-title").textContent = SITE.title;
+    document.title = SITE.title;
+  }
+  document.getElementById("site-tagline").textContent = SITE.tagline || "";
+}
+
 let activeCategory = "all";
 let query = "";
 
@@ -32,11 +41,14 @@ function renderFilters() {
   const all = [{ id: "all", name: "ყველა" }, ...CATEGORIES];
 
   filters.innerHTML = all
-    .map(
-      (c) =>
-        `<button class="chip" type="button" data-category="${c.id}"
-                 aria-pressed="${c.id === activeCategory}">${c.name}</button>`
-    )
+    .map((c) => {
+      const thumb = c.image
+        ? `<img class="chip-thumb" src="${c.image}" alt=""
+                onerror="this.remove()">`
+        : "";
+      return `<button class="chip" type="button" data-category="${c.id}"
+                      aria-pressed="${c.id === activeCategory}">${thumb}${c.name}</button>`;
+    })
     .join("");
 }
 

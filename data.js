@@ -4,15 +4,21 @@
 // სურათი ჩააგდე images/ საქაღალდეში და მიუთითე მისი სახელი image-ში.
 // თუ სურათი არ არსებობს, ავტომატურად ჩაანაცვლებს placeholder-ით.
 
+// საიტის ზოგადი პარამეტრები
+const SITE = {
+  title: "ავტონაწილები",
+  tagline: "ნაწილების კატალოგი",
+};
+
 const CATEGORIES = [
-  { id: "dzrava",     name: "ძრავი" },
-  { id: "muxruchi",   name: "სამუხრუჭე სისტემა" },
-  { id: "sakidari",   name: "საკიდარი" },
-  { id: "eleqtro",    name: "ელექტრო" },
-  { id: "filtri",     name: "ფილტრები" },
-  { id: "saburavi",   name: "საბურავები და დისკები" },
-  { id: "zeti",       name: "ზეთები და სითხეები" },
-  { id: "dzara",      name: "ძარა და ოპტიკა" },
+  { id: "dzrava", name: "ძრავი", image: "" },
+  { id: "muxruchi", name: "სამუხრუჭე სისტემა", image: "" },
+  { id: "sakidari", name: "საკიდარი", image: "" },
+  { id: "eleqtro", name: "ელექტრო", image: "" },
+  { id: "filtri", name: "ფილტრები", image: "" },
+  { id: "saburavi", name: "საბურავები და დისკები", image: "" },
+  { id: "zeti", name: "ზეთები და სითხეები", image: "" },
+  { id: "dzara", name: "ძარა და ოპტიკა", image: "" },
 ];
 
 const PARTS = [

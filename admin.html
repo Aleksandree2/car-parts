@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ბექოფისი — ავტონაწილები</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin">
+
+  <header class="admin-bar">
+    <div class="wrap admin-bar-inner">
+      <span class="admin-logo"><span class="logo-mark" aria-hidden="true">⚙</span> ბექოფისი</span>
+      <span class="admin-status" id="status"></span>
+      <div class="admin-actions">
+        <a class="btn btn-ghost" href="./" target="_blank" rel="noopener">საიტის ნახვა ↗</a>
+        <button class="btn btn-primary" type="button" id="export">data.js ჩამოტვირთვა</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs wrap" id="tabs" aria-label="განყოფილებები">
+    <button class="tab" type="button" data-tab="site" aria-pressed="true">საიტი</button>
+    <button class="tab" type="button" data-tab="categories" aria-pressed="false">კატეგორიები</button>
+    <button class="tab" type="button" data-tab="parts" aria-pressed="false">ნაწილები</button>
+  </nav>
+
+  <main class="wrap admin-main">
+
+    <!-- ── საიტი ─────────────────────────────────────── -->
+    <section class="panel" id="panel-site">
+      <h1 class="panel-title">საიტის პარამეტრები</h1>
+      <p class="panel-hint">ეს ტექსტები ჩანს საიტის თავში.</p>
+
+      <div class="field">
+        <label for="site-title">სათაური</label>
+        <input type="text" id="site-title" maxlength="60" placeholder="ავტონაწილები">
+      </div>
+
+      <div class="field">
+        <label for="site-tagline">ქვესათაური</label>
+        <input type="text" id="site-tagline" maxlength="80" placeholder="ნაწილების კატალოგი">
+      </div>
+    </section>
+
+    <!-- ── კატეგორიები ───────────────────────────────── -->
+    <section class="panel" id="panel-categories" hidden>
+      <div class="panel-head">
+        <div>
+          <h1 class="panel-title">კატეგორიები</h1>
+          <p class="panel-hint">ფოტო არასავალდებულოა — თუ დაამატებ, ფილტრის ღილაკზე გამოჩნდება.</p>
+        </div>
+        <button class="btn btn-primary" type="button" id="add-category">+ კატეგორია</button>
+      </div>
+      <div class="rows" id="category-rows"></div>
+    </section>
+
+    <!-- ── ნაწილები ──────────────────────────────────── -->
+    <section class="panel" id="panel-parts" hidden>
+      <div class="panel-head">
+        <div>
+          <h1 class="panel-title">ნაწილები</h1>
+          <p class="panel-hint" id="parts-hint"></p>
+        </div>
+        <button class="btn btn-primary" type="button" id="add-part">+ ნაწილი</button>
+      </div>
+
+      <div class="parts-toolbar">
+        <label class="search admin-search" for="part-search">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input type="search" id="part-search" placeholder="ძებნა…" autocomplete="off">
+        </label>
+        <select id="part-filter" class="select" aria-label="კატეგორიის ფილტრი"></select>
+      </div>
+
+      <div class="rows" id="part-rows"></div>
+    </section>
+
+  </main>
+
+  <!-- ── ნაწილის რედაქტორი ───────────────────────────── -->
+  <dialog id="part-dialog" class="dialog">
+    <form method="dialog" id="part-form">
+      <h2 class="dialog-title" id="dialog-title">ნაწილის რედაქტირება</h2>
+
+      <div class="dialog-grid">
+        <div class="field span-2">
+          <label for="p-name">დასახელება</label>
+          <input type="text" id="p-name" required maxlength="80">
+        </div>
+
+        <div class="field">
+          <label for="p-category">კატეგორია</label>
+          <select id="p-category" class="select" required></select>
+        </div>
+
+        <div class="field">
+          <label for="p-price">ფასი (₾)</label>
+          <input type="number" id="p-price" min="0" step="1" required>
+        </div>
+
+        <div class="field span-2">
+          <label for="p-desc">აღწერა</label>
+          <textarea id="p-desc" rows="2" maxlength="200"></textarea>
+        </div>
+
+        <div class="field span-2">
+          <label>ფოტო</label>
+          <div class="photo-field">
+            <div class="photo-preview" id="p-preview"></div>
+            <div class="photo-controls">
+              <button class="btn btn-soft" type="button" id="p-upload">ფოტოს ატვირთვა</button>
+              <button class="btn btn-ghost" type="button" id="p-clear">წაშლა</button>
+              <input type="text" id="p-path" placeholder="ან მიუთითე ბილიკი: images/part.jpg">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" type="button" id="p-cancel">გაუქმება</button>
+        <button class="btn btn-primary" type="submit">შენახვა</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- data.js-ის ექსპორტი -->
+  <dialog id="export-dialog" class="dialog">
+    <div class="export-body">
+      <h2 class="dialog-title">ახალი data.js</h2>
+      <p class="panel-hint">
+        ჩამოტვირთე ან დააკოპირე და ჩაანაცვლე პროექტში არსებული
+        <code>data.js</code>, შემდეგ დაკომიტე.
+      </p>
+      <textarea id="export-text" readonly spellcheck="false" aria-label="data.js-ის შიგთავსი"></textarea>
+      <div class="dialog-actions">
+        <span class="export-size" id="export-size"></span>
+        <button class="btn btn-ghost" type="button" id="export-close">დახურვა</button>
+        <button class="btn btn-soft" type="button" id="export-copy">კოპირება</button>
+        <button class="btn btn-primary" type="button" id="export-download">ჩამოტვირთვა</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

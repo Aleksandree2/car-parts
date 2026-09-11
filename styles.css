@@ -123,6 +123,9 @@ body {
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 16px;
   font: inherit;
   font-size: 14px;
@@ -136,6 +139,15 @@ body {
 }
 
 .chip:hover { border-color: #c9ccd4; }
+
+.chip-thumb {
+  width: 22px;
+  height: 22px;
+  margin-inline-start: -6px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eef0f3;
+}
 
 .chip[aria-pressed="true"] {
   background: var(--brand);
