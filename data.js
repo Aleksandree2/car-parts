@@ -13,7 +13,7 @@ const SITE = {
 const SLIDES = [
   {
     image: "images/slide-mtxhpgfbhb3p.jpg",
-    title: "წარწერაააა",
+    title: "ფასდაკლებაააააააა",
     link: "",
   },
   {
