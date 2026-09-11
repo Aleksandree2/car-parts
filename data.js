@@ -32,7 +32,7 @@ const PARTS = [
     name: "RAYS 5113 R18 9.5 J 10.5 J Dark Gunmetal",
     category: "diskebi",
     price: 2500,
-    sale: 20,
+    sale: 2200,
     images: [
       "images/5113-lp95-r18-mtxewhmq0kzd.jpg",
     ],
@@ -67,6 +67,8 @@ const PARTS = [
     images: [
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hssr4.jpg",
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hi8or.jpg",
+      "images/te37-r19-9-5-j-10-5-j-ma-mtxkskkqikxf.jpg",
+      "images/te37-r19-9-5-j-10-5-j-ma-mtxkskkqgpov.jpg",
     ],
     description: "TE37 R19 9.5 J 10.5 J ET:22 (5.112) < (5.113.1)>(5.114.3) Matt Bronze  CB:73.1",
   },
@@ -102,8 +104,9 @@ const PARTS = [
     price: 2900,
     sale: 0,
     images: [
-      "images/hf697-rays-volk-racing-t-mtxk6u0gkulr.jpg",
-      "images/hf697-rays-volk-racing-t-mtxk6u0hux7v.jpg",
+      "images/hf697-rays-volk-racing-t-mtxkskkqujte.jpg",
+      "images/hf697-rays-volk-racing-t-mtxkskkq3obc.jpg",
+      "images/hf697-rays-volk-racing-t-mtxkskkqblb8.jpg",
     ],
     description: "RAYS Volk Racing Te37  \nR20 9.5 J   5.114.3 ET:30 MAT BLUE (CB:73.1)\nR20 10.5 J 5.114.3 ET:25 MAT BLUE (CB:73.1)",
   },
