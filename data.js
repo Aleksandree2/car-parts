@@ -61,4 +61,15 @@ const PARTS = [
     ],
     description: "TE37 R19 9.5 J 10.5 J ET:22 (5.112) < (5.113.1)>(5.114.3) Matt Bronze  CB:73.1",
   },
+  {
+    name: "5825A BMW 5X120 R20 8.5 J 9.5 J",
+    category: "diskebi",
+    price: 2600,
+    images: [
+      "images/5825a-bmw-5x120-r20-8-5--mtxiltwohebm.jpg",
+      "images/5825a-bmw-5x120-r20-8-5--mtxiltwp7smi.jpg",
+      "images/5825a-bmw-5x120-r20-8-5--mtxiltwpvjn3.jpg",
+    ],
+    description: "5825A R20X8.5 J 5X120 ET:25  MB (CB:72.6)\n5825A R20X9.5 J 5X120 ET:40  MB (CB:72.6)",
+  },
 ];
