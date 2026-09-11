@@ -31,6 +31,14 @@ function placeholder() {
   );
 }
 
+// ნაწილს შეიძლება ჰქონდეს images: [...] (ახალი) ან image: "..." (ძველი)
+const imagesOf = (item) =>
+  Array.isArray(item.images)
+    ? item.images.filter(Boolean)
+    : item.image
+    ? [item.image]
+    : [];
+
 const categoryName = (id) =>
   (CATEGORIES.find((c) => c.id === id) || {}).name || id;
 
@@ -95,16 +103,24 @@ function render() {
     .map(
       (p) => `
       <article class="card">
-        ${p.image
-          ? `<button class="card-media is-zoomable" type="button"
-                     data-zoom="${p.image}" data-name="${p.name}"
-                     aria-label="${p.name} — სურათის გადიდება">
-               <img src="${p.image}" alt="${p.name}" loading="lazy"
-                    onerror="this.onerror=null; this.src='${fallback}'">
-             </button>`
-          : `<div class="card-media">
-               <img src="${fallback}" alt="" loading="lazy">
-             </div>`}
+        ${(() => {
+          const photos = imagesOf(p);
+          if (!photos.length) {
+            return `<div class="card-media">
+                      <img src="${fallback}" alt="" loading="lazy">
+                    </div>`;
+          }
+          return `<button class="card-media is-zoomable" type="button"
+                          data-zoom="${encodeURIComponent(JSON.stringify(photos))}"
+                          data-name="${p.name}"
+                          aria-label="${p.name} — სურათების ნახვა">
+                    <img src="${photos[0]}" alt="${p.name}" loading="lazy"
+                         onerror="this.onerror=null; this.src='${fallback}'">
+                    ${photos.length > 1
+                      ? `<span class="photo-count">🖼 ${photos.length}</span>`
+                      : ""}
+                  </button>`;
+        })()}
         <div class="card-body">
           <span class="card-cat">${categoryName(p.category)}</span>
           <h2 class="card-title">${p.name}</h2>
@@ -122,31 +138,67 @@ function render() {
 }
 
 
-// ── სურათის გადიდება ─────────────────────────────────
+// ── სურათების გალერეა ────────────────────────────────
 // <dialog> Escape-სა და ფოკუსს თავად უვლის; ფონზე დაჭერას ვამოწმებთ.
 const lightbox = document.getElementById("lightbox");
 const lightboxImg = document.getElementById("lightbox-img");
 const lightboxCaption = document.getElementById("lightbox-caption");
+const lightboxPrev = document.getElementById("lightbox-prev");
+const lightboxNext = document.getElementById("lightbox-next");
+const lightboxCounter = document.getElementById("lightbox-counter");
+
+let gallery = [];
+let galleryIndex = 0;
+let galleryName = "";
+
+function showPhoto(i) {
+  galleryIndex = (i + gallery.length) % gallery.length;
+  lightboxImg.src = gallery[galleryIndex];
+  lightboxImg.alt = galleryName;
+
+  const many = gallery.length > 1;
+  lightboxPrev.hidden = !many;
+  lightboxNext.hidden = !many;
+  lightboxCounter.hidden = !many;
+  lightboxCounter.textContent = `${galleryIndex + 1} / ${gallery.length}`;
+  lightboxCaption.textContent = galleryName;
+}
 
 grid.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-zoom]");
   if (!btn) return;
-  lightboxImg.src = btn.dataset.zoom;
-  lightboxImg.alt = btn.dataset.name || "";
-  lightboxCaption.textContent = btn.dataset.name || "";
+  try {
+    gallery = JSON.parse(decodeURIComponent(btn.dataset.zoom));
+  } catch (err) {
+    return;
+  }
+  if (!gallery.length) return;
+  galleryName = btn.dataset.name || "";
+  showPhoto(0);
   lightbox.showModal();
 });
 
+lightboxPrev.addEventListener("click", () => showPhoto(galleryIndex - 1));
+lightboxNext.addEventListener("click", () => showPhoto(galleryIndex + 1));
+
 document.getElementById("lightbox-close").addEventListener("click", () => lightbox.close());
 
-// ფონზე დაჭერით დახურვა — თავად სურათზე დაჭერამ არ უნდა დახუროს
+// ფონზე დაჭერით დახურვა — სურათზე ან ღილაკზე დაჭერამ არ უნდა დახუროს
 lightbox.addEventListener("click", (e) => {
   if (e.target === lightbox) lightbox.close();
+});
+
+// ისრებით გადათვალიერება
+lightbox.addEventListener("keydown", (e) => {
+  if (gallery.length < 2) return;
+  if (e.key === "ArrowLeft") { e.preventDefault(); showPhoto(galleryIndex - 1); }
+  if (e.key === "ArrowRight") { e.preventDefault(); showPhoto(galleryIndex + 1); }
 });
 
 // დახურვისას src ვიცლით, რომ მეხსიერებაში დიდი სურათი არ დარჩეს
 lightbox.addEventListener("close", () => {
   lightboxImg.removeAttribute("src");
+  gallery = [];
 });
 
 window.addEventListener("themechange", render);

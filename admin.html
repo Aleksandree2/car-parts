@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=2">
-  <link rel="stylesheet" href="admin.css?v=2">
-  <script src="theme.js?v=2"></script>
+  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="admin.css?v=3">
+  <script src="theme.js?v=3"></script>
 </head>
 <body class="admin">
 
@@ -180,15 +180,19 @@
         </div>
 
         <div class="field span-2">
-          <label>ფოტო</label>
-          <div class="photo-field">
-            <div class="photo-preview" id="p-preview"></div>
-            <div class="photo-controls">
-              <button class="btn btn-soft" type="button" id="p-upload">ფოტოს ატვირთვა</button>
-              <button class="btn btn-ghost" type="button" id="p-clear">წაშლა</button>
-              <input type="text" id="p-path" placeholder="ან მიუთითე ბილიკი: images/part.jpg">
-            </div>
+          <label>ფოტოები</label>
+          <div class="photos" id="p-photos"></div>
+          <div class="photo-controls">
+            <button class="btn btn-soft" type="button" id="p-upload">+ ფოტოს დამატება</button>
+            <button class="btn btn-ghost" type="button" id="p-clear">ყველას წაშლა</button>
+            <input type="text" id="p-path" autocomplete="off"
+                   placeholder="ან ბილიკი: images/part.jpg">
+            <button class="btn btn-ghost" type="button" id="p-path-add">დამატება</button>
           </div>
+          <p class="panel-hint photos-hint">
+            პირველი ფოტო მთავარია — სწორედ ის ჩანს ბარათზე. ერთდროულად
+            რამდენიმეს არჩევაც შეიძლება.
+          </p>
         </div>
       </div>
 
@@ -230,9 +234,9 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="logo.js?v=2"></script>
+  <script src="logo.js?v=3"></script>
   <script src="data.js"></script>
-  <script src="publish.js?v=2"></script>
-  <script src="admin.js?v=2"></script>
+  <script src="publish.js?v=3"></script>
+  <script src="admin.js?v=3"></script>
 </body>
 </html>

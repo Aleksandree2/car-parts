@@ -60,6 +60,16 @@ const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+// ნაწილს შეიძლება ჰქონდეს images: [...] (ახალი) ან image: "..." (ძველი)
+const imagesOf = (item) =>
+  Array.isArray(item.images)
+    ? item.images.filter(Boolean)
+    : item.image
+    ? [item.image]
+    : [];
+
+const mainImage = (item) => imagesOf(item)[0] || "";
+
 const categoryName = (id) =>
   (state.categories.find((c) => c.id === id) || {}).name || "—";
 
@@ -160,11 +170,12 @@ function readImage(file) {
   });
 }
 
-function pickImage() {
+function pickImages() {
   return new Promise((resolve) => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/jpeg,image/png,image/webp,image/gif,image/*";
+    input.multiple = true;
 
     // ზოგიერთ მობილურ ბრაუზერში DOM-ს გარეთ მყოფ input-ზე click() არაფერს
     // აკეთებს — ფაილის ასარჩევი ფანჯარა საერთოდ არ იხსნება
@@ -178,20 +189,26 @@ function pickImage() {
     };
 
     input.addEventListener("change", async () => {
-      const file = input.files && input.files[0];
-      if (!file) { done(null); return; }
-      try {
-        const image = await readImage(file);
-        toast(`ფოტო დაემატა (${file.name})`);
-        done(image);
-      } catch (err) {
-        alert(err.message); // toast-ს ვერ დაინახავს, თუ დიალოგი ღიაა
-        done(null);
+      const files = Array.from(input.files || []);
+      if (!files.length) { done([]); return; }
+
+      const images = [];
+      const failed = [];
+      for (const file of files) {
+        try {
+          images.push(await readImage(file));
+        } catch (err) {
+          failed.push(`${file.name}: ${err.message}`);
+        }
       }
+      // ერთი გაფუჭებული ფაილი დანარჩენებს არ უნდა აფერხებდეს
+      if (failed.length) alert(failed.join("\n\n"));
+      if (images.length) toast(`დაემატა ${images.length} ფოტო`);
+      done(images);
     });
 
     // არჩევის გაუქმებაზე promise დაკიდებული რომ არ დარჩეს
-    input.addEventListener("cancel", () => done(null));
+    input.addEventListener("cancel", () => done([]));
 
     input.click();
   });
@@ -252,7 +269,7 @@ categoryRows.addEventListener("click", async (e) => {
   }
 
   if (btn.dataset.action === "photo") {
-    const image = await pickImage();
+    const [image] = await pickImages();
     if (image) {
       cat.image = image;
       save();
@@ -347,7 +364,7 @@ function renderParts() {
   partRows.innerHTML = rows
     .map(({ p, index }) => `
       <div class="row" data-index="${index}">
-        ${thumb(p.image, "🔧")}
+        ${thumb(mainImage(p), "🔧")}
         <div class="row-main">
           <p class="row-title">${escapeHtml(p.name)}</p>
           <span class="row-meta">${escapeHtml(categoryName(p.category))}</span>
@@ -384,15 +401,46 @@ partRows.addEventListener("click", (e) => {
 
 // ── ნაწილის რედაქტორი ────────────────────────────────
 const dialog = $("part-dialog");
-let draftImage = "";
+const photosBox = $("p-photos");
+let draftImages = [];
 
-function setPreview(src) {
-  draftImage = src || "";
-  $("p-preview").innerHTML = draftImage
-    ? `<img src="${escapeHtml(draftImage)}" alt=""
-           onerror="this.parentNode.textContent='ვერ ჩაიტვირთა'">`
-    : "ფოტო არ არის";
+function renderPhotos() {
+  if (!draftImages.length) {
+    photosBox.innerHTML = `<p class="photos-empty">ფოტო ჯერ არ არის</p>`;
+    return;
+  }
+  photosBox.innerHTML = draftImages
+    .map((src, i) => `
+      <figure class="photo" data-index="${i}">
+        <img src="${escapeHtml(src)}" alt=""
+             onerror="this.replaceWith(Object.assign(document.createElement('span'),
+                      {className:'photo-broken', textContent:'ვერ ჩაიტვირთა'}))">
+        ${i === 0 ? `<span class="photo-badge">მთავარი</span>` : ""}
+        <div class="photo-tools">
+          <button class="btn-icon" type="button" data-photo="left"
+                  ${i === 0 ? "disabled" : ""} title="წინ">‹</button>
+          <button class="btn-icon" type="button" data-photo="right"
+                  ${i === draftImages.length - 1 ? "disabled" : ""} title="უკან">›</button>
+          <button class="btn-icon danger" type="button" data-photo="remove"
+                  title="წაშლა">✕</button>
+        </div>
+      </figure>`)
+    .join("");
 }
+
+photosBox.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-photo]");
+  if (!btn) return;
+  const i = Number(btn.closest(".photo").dataset.index);
+
+  if (btn.dataset.photo === "remove") {
+    draftImages.splice(i, 1);
+  } else {
+    const j = btn.dataset.photo === "left" ? i - 1 : i + 1;
+    [draftImages[i], draftImages[j]] = [draftImages[j], draftImages[i]];
+  }
+  renderPhotos();
+});
 
 function openPart(index) {
   if (!state.categories.length) {
@@ -401,7 +449,7 @@ function openPart(index) {
   }
   editingIndex = index;
   const p = index < 0
-    ? { name: "", category: state.categories[0].id, price: "", description: "", image: "" }
+    ? { name: "", category: state.categories[0].id, price: "", description: "" }
     : state.parts[index];
 
   $("dialog-title").textContent = index < 0 ? "ახალი ნაწილი" : "ნაწილის რედაქტირება";
@@ -409,8 +457,9 @@ function openPart(index) {
   $("p-category").value = p.category;
   $("p-price").value = p.price;
   $("p-desc").value = p.description || "";
-  $("p-path").value = p.image && !p.image.startsWith("data:") ? p.image : "";
-  setPreview(p.image);
+  $("p-path").value = "";
+  draftImages = imagesOf(p);
+  renderPhotos();
   dialog.showModal();
   $("p-name").focus();
 }
@@ -419,20 +468,35 @@ $("add-part").addEventListener("click", () => openPart(-1));
 $("p-cancel").addEventListener("click", () => dialog.close());
 
 $("p-upload").addEventListener("click", async () => {
-  const image = await pickImage();
-  if (image) {
-    $("p-path").value = "";
-    setPreview(image);
+  const images = await pickImages();
+  if (images.length) {
+    draftImages = draftImages.concat(images);
+    renderPhotos();
   }
 });
 
 $("p-clear").addEventListener("click", () => {
-  $("p-path").value = "";
-  setPreview("");
+  if (!draftImages.length) return;
+  if (!confirm("წავშალოთ ამ ნაწილის ყველა ფოტო?")) return;
+  draftImages = [];
+  renderPhotos();
 });
 
-$("p-path").addEventListener("input", (e) => {
-  if (e.target.value.trim()) setPreview(e.target.value.trim());
+function addPath() {
+  const path = $("p-path").value.trim();
+  if (!path) return;
+  if (draftImages.includes(path)) {
+    toast("ეს ბილიკი უკვე დამატებულია");
+    return;
+  }
+  draftImages.push(path);
+  $("p-path").value = "";
+  renderPhotos();
+}
+
+$("p-path-add").addEventListener("click", addPath);
+$("p-path").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); addPath(); }
 });
 
 $("part-form").addEventListener("submit", () => {
@@ -440,7 +504,7 @@ $("part-form").addEventListener("submit", () => {
     name: $("p-name").value.trim(),
     category: $("p-category").value,
     price: Number($("p-price").value) || 0,
-    image: $("p-path").value.trim() || draftImage,
+    images: draftImages.slice(),
     description: $("p-desc").value.trim(),
   };
 
@@ -462,15 +526,21 @@ function buildDataFile() {
     .join("\n");
 
   const parts = state.parts
-    .map((p) => [
-      "  {",
-      `    name: ${q(p.name)},`,
-      `    category: ${q(p.category)},`,
-      `    price: ${Number(p.price) || 0},`,
-      `    image: ${q(p.image || "")},`,
-      `    description: ${q(p.description || "")},`,
-      "  },",
-    ].join("\n"))
+    .map((p) => {
+      const list = imagesOf(p);
+      const images = list.length
+        ? "[\n" + list.map((src) => `      ${q(src)},`).join("\n") + "\n    ]"
+        : "[]";
+      return [
+        "  {",
+        `    name: ${q(p.name)},`,
+        `    category: ${q(p.category)},`,
+        `    price: ${Number(p.price) || 0},`,
+        `    images: ${images},`,
+        `    description: ${q(p.description || "")},`,
+        "  },",
+      ].join("\n");
+    })
     .join("\n");
 
   return `// ავტონაწილების მონაცემები
@@ -644,16 +714,24 @@ function collectUploads() {
   const next = JSON.parse(JSON.stringify(state));
   const files = [];
 
-  const swap = (item) => {
-    if (!GitHubPublisher.isDataUrl(item.image)) return;
-    const { base64, ext } = GitHubPublisher.splitDataUrl(item.image);
-    const path = imageFileName(item.name, ext);
+  const upload = (dataUrl, name) => {
+    const { base64, ext } = GitHubPublisher.splitDataUrl(dataUrl);
+    const path = imageFileName(name, ext);
     files.push({ path, content: base64, encoding: "base64" });
-    item.image = path;
+    return path;
   };
 
-  next.categories.forEach(swap);
-  next.parts.forEach(swap);
+  for (const c of next.categories) {
+    if (GitHubPublisher.isDataUrl(c.image)) c.image = upload(c.image, c.name);
+  }
+
+  for (const part of next.parts) {
+    part.images = imagesOf(part).map((src) =>
+      GitHubPublisher.isDataUrl(src) ? upload(src, part.name) : src
+    );
+    delete part.image; // ძველი ერთფოტოიანი ველი აღარ გვჭირდება
+  }
+
   return { next, files };
 }
 

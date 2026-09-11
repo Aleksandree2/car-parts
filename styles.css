@@ -472,3 +472,63 @@ body {
   .card-media.is-zoomable img,
   .card-media.is-zoomable:hover img { transition: none; transform: none; }
 }
+
+/* ── გალერეის ნავიგაცია ──────────────────────────────── */
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  box-shadow: var(--shadow-strong);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.lightbox-nav:hover { color: var(--brand); border-color: var(--brand); }
+
+.lightbox-prev { inset-inline-start: -18px; }
+.lightbox-next { inset-inline-end: -18px; }
+
+.lightbox-counter {
+  position: absolute;
+  top: 12px;
+  inset-inline-start: 12px;
+  padding: 4px 11px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: rgba(0, 0, 0, .62);
+  border-radius: 999px;
+}
+
+/* რამდენიმე ფოტოს ნიშანი ბარათზე */
+.card-media { position: relative; }
+
+.photo-count {
+  position: absolute;
+  bottom: 8px;
+  inset-inline-end: 8px;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, .6);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+@media (max-width: 520px) {
+  .lightbox-prev { inset-inline-start: 4px; }
+  .lightbox-next { inset-inline-end: 4px; }
+  .lightbox-nav { width: 38px; height: 38px; font-size: 22px; }
+}

@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=2">
-  <script src="theme.js?v=2"></script>
+  <link rel="stylesheet" href="styles.css?v=3">
+  <script src="theme.js?v=3"></script>
 </head>
 <body>
 
@@ -51,8 +51,13 @@
   <dialog class="lightbox" id="lightbox" aria-label="სურათი">
     <button class="lightbox-close" type="button" id="lightbox-close"
             aria-label="დახურვა">✕</button>
+    <button class="lightbox-nav lightbox-prev" type="button" id="lightbox-prev"
+            aria-label="წინა ფოტო" hidden>‹</button>
     <img class="lightbox-img" id="lightbox-img" alt="">
+    <button class="lightbox-nav lightbox-next" type="button" id="lightbox-next"
+            aria-label="შემდეგი ფოტო" hidden>›</button>
     <p class="lightbox-caption" id="lightbox-caption"></p>
+    <span class="lightbox-counter" id="lightbox-counter" hidden></span>
   </dialog>
 
   <footer class="site-footer">
@@ -61,8 +66,8 @@
     </div>
   </footer>
 
-  <script src="logo.js?v=2"></script>
+  <script src="logo.js?v=3"></script>
   <script src="data.js"></script>
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
