@@ -39,7 +39,8 @@ function save() {
     localStorage.setItem(DRAFT_KEY, JSON.stringify(state));
     setStatus("შენახულია ბრაუზერში — არ დაგავიწყდეს data.js-ის ჩამოტვირთვა");
   } catch (e) {
-    setStatus("⚠ ბრაუზერში ვერ შეინახა (ადგილი ამოიწურა) — ჩამოტვირთე data.js");
+    setStatus("⚠ ბრაუზერში ვერ შეინახა — ადგილი ამოიწურა");
+    toast("⚠ ბრაუზერის მეხსიერება ამოიწურა — დააჭირე „შენახვა საიტზე“ ახლავე");
   }
 }
 
@@ -116,22 +117,42 @@ $("site-tagline").addEventListener("input", (e) => {
 // დიდი ფოტო data.js-ს უსაფუძვლოდ ბერავს, ამიტომ ატვირთვისას ვამცირებთ.
 function readImage(file) {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith("image/")) {
-      reject(new Error("ეს ფაილი სურათი არ არის"));
+    // iPhone-ის HEIC/HEIF-ს ბრაუზერი ვერ ხსნის — ჯობია პირდაპირ ვუთხრათ
+    const heic = /\.(heic|heif)$/i.test(file.name) || /hei[cf]/i.test(file.type);
+    if (heic) {
+      reject(new Error(
+        "HEIC ფორმატს ბრაუზერი ვერ ხსნის.\n\n" +
+        "iPhone-ზე: Settings → Camera → Formats → Most Compatible, " +
+        "ან გააზიარე ფოტო როგორც JPEG."
+      ));
       return;
     }
+    if (file.type && !file.type.startsWith("image/")) {
+      reject(new Error(`ეს ფაილი სურათი არ არის (${file.type || "უცნობი ტიპი"})`));
+      return;
+    }
+
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("ფაილი ვერ წაიკითხა"));
     reader.onload = () => {
       const img = new Image();
-      img.onerror = () => reject(new Error("სურათი ვერ გაიხსნა"));
+      img.onerror = () =>
+        reject(new Error("სურათი ვერ გაიხსნა — სცადე JPEG ან PNG ფორმატში"));
       img.onload = () => {
+        if (!img.width || !img.height) {
+          reject(new Error("სურათი ცარიელია"));
+          return;
+        }
         const scale = Math.min(1, MAX_IMAGE_PX / Math.max(img.width, img.height));
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL("image/jpeg", IMAGE_QUALITY));
+        try {
+          resolve(canvas.toDataURL("image/jpeg", IMAGE_QUALITY));
+        } catch (e) {
+          reject(new Error("სურათის დამუშავება ვერ მოხერხდა"));
+        }
       };
       img.src = reader.result;
     };
@@ -143,17 +164,35 @@ function pickImage() {
   return new Promise((resolve) => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "image/*";
+    input.accept = "image/jpeg,image/png,image/webp,image/gif,image/*";
+
+    // ზოგიერთ მობილურ ბრაუზერში DOM-ს გარეთ მყოფ input-ზე click() არაფერს
+    // აკეთებს — ფაილის ასარჩევი ფანჯარა საერთოდ არ იხსნება
+    input.style.position = "fixed";
+    input.style.left = "-9999px";
+    document.body.appendChild(input);
+
+    const done = (value) => {
+      input.remove();
+      resolve(value);
+    };
+
     input.addEventListener("change", async () => {
       const file = input.files && input.files[0];
-      if (!file) { resolve(null); return; }
+      if (!file) { done(null); return; }
       try {
-        resolve(await readImage(file));
+        const image = await readImage(file);
+        toast(`ფოტო დაემატა (${file.name})`);
+        done(image);
       } catch (err) {
-        toast(err.message);
-        resolve(null);
+        alert(err.message); // toast-ს ვერ დაინახავს, თუ დიალოგი ღიაა
+        done(null);
       }
     });
+
+    // არჩევის გაუქმებაზე promise დაკიდებული რომ არ დარჩეს
+    input.addEventListener("cancel", () => done(null));
+
     input.click();
   });
 }
