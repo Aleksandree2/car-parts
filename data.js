@@ -72,4 +72,17 @@ const PARTS = [
     ],
     description: "5825A R20X8.5 J 5X120 ET:25  MB (CB:72.6)\n5825A R20X9.5 J 5X120 ET:40  MB (CB:72.6)",
   },
+  {
+    name: "5964 BMW 5X120 R19",
+    category: "dzrava",
+    price: 2500,
+    images: [
+      "images/5964-bmw-5x120-r19-mtxjlqc0775d.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc05yaq.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc1ijsf.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc1slzc.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc19gfh.jpg",
+    ],
+    description: "5964 BMW 5X120 R19 8J ET:30  R19 9J ET:44 MB (CB.72.6)",
+  },
 ];
