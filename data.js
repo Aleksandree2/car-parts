@@ -9,6 +9,9 @@ const SITE = {
   tagline: "ნაწილების კატალოგი",
 };
 
+// მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)
+const SLIDES = [];
+
 const CATEGORIES = [
   { id: "dzrava", name: "ძრავი", image: "" },
   { id: "muxruchi", name: "სამუხრუჭე სისტემა", image: "" },

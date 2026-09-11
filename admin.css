@@ -605,3 +605,11 @@
 }
 
 .photos-hint { margin: 0; }
+
+/* ფასდაკლების მინიშნება დიალოგში */
+.panel-hint.ok { color: var(--ok); }
+.panel-hint.bad { color: var(--brand); }
+
+/* სლაიდის სტრიქონში ორი ველია */
+#slide-rows .row-main { gap: 5px; }
+#slide-rows .row-main input { font-weight: 500; font-size: 14px; }

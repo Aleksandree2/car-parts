@@ -39,6 +39,22 @@ const imagesOf = (item) =>
     ? [item.image]
     : [];
 
+// ფასდაკლება მაშინაა, როცა sale დადებითია და ჩვეულებრივზე ნაკლები
+function priceBlock(p) {
+  const price = Number(p.price) || 0;
+  const sale = Number(p.sale) || 0;
+  const on = sale > 0 && sale < price;
+
+  if (!on) return `<span class="card-price">${price} ₾</span>`;
+
+  const off = Math.round((1 - sale / price) * 100);
+  return `<span class="card-price is-sale">
+            <span class="price-now">${sale} ₾</span>
+            <s class="price-was">${price} ₾</s>
+            <span class="price-off">−${off}%</span>
+          </span>`;
+}
+
 const categoryName = (id) =>
   (CATEGORIES.find((c) => c.id === id) || {}).name || id;
 
@@ -119,13 +135,16 @@ function render() {
                     ${photos.length > 1
                       ? `<span class="photo-count">🖼 ${photos.length}</span>`
                       : ""}
+                    ${Number(p.sale) > 0 && Number(p.sale) < Number(p.price)
+                      ? `<span class="sale-flag">ფასდაკლება</span>`
+                      : ""}
                   </button>`;
         })()}
         <div class="card-body">
           <span class="card-cat">${categoryName(p.category)}</span>
           <h2 class="card-title">${p.name}</h2>
           <p class="card-desc">${p.description || ""}</p>
-          <span class="card-price">${p.price} ₾</span>
+          ${priceBlock(p)}
         </div>
       </article>`
     )
@@ -200,6 +219,86 @@ lightbox.addEventListener("close", () => {
   lightboxImg.removeAttribute("src");
   gallery = [];
 });
+
+// ── სლაიდერი ─────────────────────────────────────────
+const slider = document.getElementById("slider");
+const sliderTrack = document.getElementById("slider-track");
+const sliderDots = document.getElementById("slider-dots");
+const sliderPrev = document.getElementById("slider-prev");
+const sliderNext = document.getElementById("slider-next");
+
+const slides =
+  typeof SLIDES !== "undefined" && Array.isArray(SLIDES)
+    ? SLIDES.filter((s) => s && s.image)
+    : [];
+
+let slideIndex = 0;
+let slideTimer = null;
+
+function showSlide(i) {
+  slideIndex = (i + slides.length) % slides.length;
+  sliderTrack.style.transform = `translateX(-${slideIndex * 100}%)`;
+  for (const [n, dot] of [...sliderDots.children].entries()) {
+    dot.setAttribute("aria-current", String(n === slideIndex));
+  }
+}
+
+function startAuto() {
+  stopAuto();
+  if (slides.length < 2) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  slideTimer = setInterval(() => showSlide(slideIndex + 1), 6000);
+}
+
+function stopAuto() {
+  if (slideTimer) clearInterval(slideTimer);
+  slideTimer = null;
+}
+
+function renderSlider() {
+  if (!slides.length) return; // სლაიდი არ არის — სექცია დამალული რჩება
+
+  slider.hidden = false;
+  sliderTrack.innerHTML = slides
+    .map((sl) => {
+      const inner = `<img src="${sl.image}" alt="${sl.title || ""}" loading="lazy">
+                     ${sl.title ? `<span class="slide-title">${sl.title}</span>` : ""}`;
+      return sl.link
+        ? `<a class="slide" href="${sl.link}" rel="noopener">${inner}</a>`
+        : `<div class="slide">${inner}</div>`;
+    })
+    .join("");
+
+  const many = slides.length > 1;
+  sliderPrev.hidden = !many;
+  sliderNext.hidden = !many;
+  sliderDots.innerHTML = many
+    ? slides
+        .map((_, i) => `<button class="slider-dot" type="button"
+                                data-slide="${i}" aria-label="ბანერი ${i + 1}"></button>`)
+        .join("")
+    : "";
+
+  showSlide(0);
+  startAuto();
+}
+
+sliderPrev.addEventListener("click", () => { showSlide(slideIndex - 1); startAuto(); });
+sliderNext.addEventListener("click", () => { showSlide(slideIndex + 1); startAuto(); });
+sliderDots.addEventListener("click", (e) => {
+  const dot = e.target.closest("[data-slide]");
+  if (!dot) return;
+  showSlide(Number(dot.dataset.slide));
+  startAuto();
+});
+
+// მაუსის ან ფოკუსის დროს ავტომატური გადასვლა ჩერდება
+slider.addEventListener("mouseenter", stopAuto);
+slider.addEventListener("mouseleave", startAuto);
+slider.addEventListener("focusin", stopAuto);
+slider.addEventListener("focusout", startAuto);
+
+renderSlider();
 
 window.addEventListener("themechange", render);
 

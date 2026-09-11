@@ -11,6 +11,7 @@ const IMAGE_QUALITY = 0.82;
 // ── მდგომარეობა ──────────────────────────────────────
 const fromFile = () => ({
   site: { title: SITE.title, tagline: SITE.tagline },
+  slides: typeof SLIDES !== "undefined" ? SLIDES.map((s) => ({ ...s })) : [],
   categories: CATEGORIES.map((c) => ({ ...c, image: c.image || "" })),
   parts: PARTS.map((p) => ({ ...p })),
 });
@@ -21,6 +22,7 @@ function loadDraft() {
     if (raw) {
       const d = JSON.parse(raw);
       if (d && d.site && Array.isArray(d.categories) && Array.isArray(d.parts)) {
+        if (!Array.isArray(d.slides)) d.slides = []; // ძველი დრაფტი
         return d;
       }
     }
@@ -219,6 +221,87 @@ const thumb = (src, fallback) =>
     ? `<span class="row-thumb"><img src="${escapeHtml(src)}" alt=""
          onerror="this.parentNode.textContent='🖼'"></span>`
     : `<span class="row-thumb">${fallback}</span>`;
+
+// ── სლაიდერი ─────────────────────────────────────────
+const slideRows = $("slide-rows");
+
+function renderSlides() {
+  const list = state.slides || [];
+  if (!list.length) {
+    slideRows.innerHTML =
+      `<p class="rows-empty">სლაიდი არ არის. დააჭირე „+ სლაიდი“.</p>`;
+    return;
+  }
+  slideRows.innerHTML = list
+    .map((sl, i) => `
+      <div class="row" data-index="${i}">
+        ${thumb(sl.image, "🖼")}
+        <div class="row-main">
+          <input type="text" value="${escapeHtml(sl.title || "")}"
+                 data-slide="title" placeholder="წარწერა (არასავალდებულო)"
+                 aria-label="სლაიდის წარწერა">
+          <input type="text" value="${escapeHtml(sl.link || "")}"
+                 data-slide="link" placeholder="ბმული (არასავალდებულო)"
+                 aria-label="სლაიდის ბმული">
+        </div>
+        <div class="row-tools">
+          <button class="btn-icon" type="button" data-slide-act="up"
+                  ${i === 0 ? "disabled" : ""} title="ზემოთ">↑</button>
+          <button class="btn-icon" type="button" data-slide-act="down"
+                  ${i === list.length - 1 ? "disabled" : ""} title="ქვემოთ">↓</button>
+          <button class="btn-icon" type="button" data-slide-act="photo" title="ფოტო">📷</button>
+          <button class="btn-icon danger" type="button" data-slide-act="delete" title="წაშლა">✕</button>
+        </div>
+      </div>`)
+    .join("");
+}
+
+slideRows.addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-slide-act]");
+  if (!btn) return;
+  const i = Number(btn.closest(".row").dataset.index);
+  const act = btn.dataset.slideAct;
+
+  if (act === "up" || act === "down") {
+    const j = act === "up" ? i - 1 : i + 1;
+    [state.slides[i], state.slides[j]] = [state.slides[j], state.slides[i]];
+    save();
+    renderSlides();
+    return;
+  }
+  if (act === "photo") {
+    const [image] = await pickImages();
+    if (image) {
+      state.slides[i].image = image;
+      save();
+      renderSlides();
+    }
+    return;
+  }
+  if (act === "delete") {
+    if (!confirm("წავშალოთ ეს სლაიდი?")) return;
+    state.slides.splice(i, 1);
+    save();
+    renderSlides();
+  }
+});
+
+slideRows.addEventListener("input", (e) => {
+  const input = e.target.closest("input[data-slide]");
+  if (!input) return;
+  const i = Number(input.closest(".row").dataset.index);
+  state.slides[i][input.dataset.slide] = input.value;
+  save();
+});
+
+$("add-slide").addEventListener("click", async () => {
+  const [image] = await pickImages();
+  if (!image) return;
+  state.slides.push({ image, title: "", link: "" });
+  save();
+  renderSlides();
+  toast("სლაიდი დაემატა");
+});
 
 // ── კატეგორიები ──────────────────────────────────────
 const categoryRows = $("category-rows");
@@ -456,6 +539,8 @@ function openPart(index) {
   $("p-name").value = p.name;
   $("p-category").value = p.category;
   $("p-price").value = p.price;
+  $("p-sale").value = Number(p.sale) > 0 ? p.sale : "";
+  showSaleHint();
   $("p-desc").value = p.description || "";
   $("p-path").value = "";
   draftImages = imagesOf(p);
@@ -463,6 +548,30 @@ function openPart(index) {
   dialog.showModal();
   $("p-name").focus();
 }
+
+// ფასდაკლების პროცენტი მაშინვე ჩანდეს, რომ შეცდომა თვალსაჩინო იყოს
+function showSaleHint() {
+  const price = Number($("p-price").value) || 0;
+  const sale = Number($("p-sale").value) || 0;
+  const hint = $("p-sale-hint");
+
+  if (!sale) {
+    hint.textContent = "";
+    hint.className = "panel-hint";
+    return;
+  }
+  if (sale >= price) {
+    hint.textContent = "⚠ ფასდაკლებული ფასი ჩვეულებრივზე ნაკლები უნდა იყოს";
+    hint.className = "panel-hint bad";
+    return;
+  }
+  const off = Math.round((1 - sale / price) * 100);
+  hint.textContent = `ფასდაკლება ${off}% — ბარათზე ძველი ფასი გადახაზული იქნება`;
+  hint.className = "panel-hint ok";
+}
+
+$("p-sale").addEventListener("input", showSaleHint);
+$("p-price").addEventListener("input", showSaleHint);
 
 $("add-part").addEventListener("click", () => openPart(-1));
 $("p-cancel").addEventListener("click", () => dialog.close());
@@ -504,6 +613,7 @@ $("part-form").addEventListener("submit", () => {
     name: $("p-name").value.trim(),
     category: $("p-category").value,
     price: Number($("p-price").value) || 0,
+    sale: Number($("p-sale").value) > 0 ? Number($("p-sale").value) : 0,
     images: draftImages.slice(),
     description: $("p-desc").value.trim(),
   };
@@ -521,6 +631,16 @@ $("part-form").addEventListener("submit", () => {
 function buildDataFile() {
   const q = (s) => JSON.stringify(String(s));
 
+  const slides = (state.slides || [])
+    .map((sl) => [
+      "  {",
+      `    image: ${q(sl.image || "")},`,
+      `    title: ${q(sl.title || "")},`,
+      `    link: ${q(sl.link || "")},`,
+      "  },",
+    ].join("\n"))
+    .join("\n");
+
   const categories = state.categories
     .map((c) => `  { id: ${q(c.id)}, name: ${q(c.name)}, image: ${q(c.image || "")} },`)
     .join("\n");
@@ -536,6 +656,7 @@ function buildDataFile() {
         `    name: ${q(p.name)},`,
         `    category: ${q(p.category)},`,
         `    price: ${Number(p.price) || 0},`,
+        `    sale: ${Number(p.sale) > 0 ? Number(p.sale) : 0},`,
         `    images: ${images},`,
         `    description: ${q(p.description || "")},`,
         "  },",
@@ -553,6 +674,11 @@ const SITE = {
   title: ${q(state.site.title)},
   tagline: ${q(state.site.tagline)},
 };
+
+// მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)
+const SLIDES = [
+${slides}
+];
 
 const CATEGORIES = [
 ${categories}
@@ -718,6 +844,12 @@ function collectUploads() {
     return path;
   };
 
+  for (const sl of next.slides || []) {
+    if (GitHubPublisher.isDataUrl(sl.image)) {
+      sl.image = upload(sl.image, sl.title || "slide");
+    }
+  }
+
   for (const c of next.categories) {
     if (GitHubPublisher.isDataUrl(c.image)) c.image = upload(c.image, c.name);
   }
@@ -810,6 +942,7 @@ window.addEventListener("beforeunload", (e) => {
 });
 
 // ── გაშვება ──────────────────────────────────────────
+renderSlides();
 renderCategories();
 renderParts();
 setStatus(dirty ? "გაქვს შეუნახავი ცვლილებები" : "მონაცემები data.js-დან");

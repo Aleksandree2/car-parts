@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=4">
-  <link rel="stylesheet" href="admin.css?v=4">
-  <script src="theme.js?v=4"></script>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="admin.css?v=5">
+  <script src="theme.js?v=5"></script>
 </head>
 <body class="admin">
 
@@ -34,6 +34,7 @@
 
   <nav class="tabs wrap" id="tabs" aria-label="განყოფილებები">
     <button class="tab" type="button" data-tab="site" aria-pressed="true">საიტი</button>
+    <button class="tab" type="button" data-tab="slides" aria-pressed="false">სლაიდერი</button>
     <button class="tab" type="button" data-tab="categories" aria-pressed="false">კატეგორიები</button>
     <button class="tab" type="button" data-tab="parts" aria-pressed="false">ნაწილები</button>
     <button class="tab" type="button" data-tab="connection" aria-pressed="false">კავშირი</button>
@@ -57,6 +58,21 @@
         <input type="text" id="site-tagline" maxlength="80" autocomplete="off"
                placeholder="ნაწილების კატალოგი">
       </div>
+    </section>
+
+    <!-- ── სლაიდერი ──────────────────────────────────── -->
+    <section class="panel" id="panel-slides" hidden>
+      <div class="panel-head">
+        <div>
+          <h1 class="panel-title">სლაიდერი</h1>
+          <p class="panel-hint">
+            ბანერები მთავარ გვერდზე, კატეგორიების ზემოთ. თუ ერთიც არ არის,
+            სლაიდერი საერთოდ არ ჩანს.
+          </p>
+        </div>
+        <button class="btn btn-primary" type="button" id="add-slide">+ სლაიდი</button>
+      </div>
+      <div class="rows" id="slide-rows"></div>
     </section>
 
     <!-- ── კატეგორიები ───────────────────────────────── -->
@@ -171,7 +187,14 @@
 
         <div class="field">
           <label for="p-price">ფასი (₾)</label>
-          <input type="number" id="p-price" min="0" step="1" required>
+          <input type="number" id="p-price" min="0" step="1" autocomplete="off" required>
+        </div>
+
+        <div class="field span-2">
+          <label for="p-sale">ფასდაკლებული ფასი (₾) — არასავალდებულო</label>
+          <input type="number" id="p-sale" min="0" step="1" autocomplete="off"
+                 placeholder="ცარიელი = ფასდაკლება არ არის">
+          <p class="panel-hint" id="p-sale-hint"></p>
         </div>
 
         <div class="field span-2">
@@ -234,9 +257,9 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="logo.js?v=4"></script>
+  <script src="logo.js?v=5"></script>
   <script src="data.js"></script>
-  <script src="publish.js?v=4"></script>
-  <script src="admin.js?v=4"></script>
+  <script src="publish.js?v=5"></script>
+  <script src="admin.js?v=5"></script>
 </body>
 </html>
