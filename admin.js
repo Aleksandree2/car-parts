@@ -1,7 +1,7 @@
 // ბექოფისი — კატეგორიების, ნაწილებისა და საიტის სათაურის მართვა.
 //
 // ყველაფერი მუშაობს ბრაუზერში. ცვლილებები ინახება localStorage-ში (რომ
-// შემთხვევით არ დაიკარგოს) და „data.js ჩამოტვირთვა"-ზე გენერირდება ახალი
+// შემთხვევით არ დაიკარგოს) და „data.js ჩამოტვირთვა“-ზე გენერირდება ახალი
 // data.js — ის უნდა ჩაანაცვლო პროექტში და დაკომიტო.
 
 const DRAFT_KEY = "carparts:draft";
@@ -170,7 +170,7 @@ const categoryRows = $("category-rows");
 function renderCategories() {
   if (!state.categories.length) {
     categoryRows.innerHTML =
-      `<p class="rows-empty">ჯერ კატეგორია არ არის. დააჭირე „+ კატეგორია".</p>`;
+      `<p class="rows-empty">ჯერ კატეგორია არ არის. დააჭირე „+ კატეგორია“.</p>`;
   } else {
     categoryRows.innerHTML = state.categories
       .map((c, i) => {
@@ -226,11 +226,11 @@ categoryRows.addEventListener("click", async (e) => {
   if (btn.dataset.action === "delete") {
     const used = state.parts.filter((p) => p.category === cat.id).length;
     if (used) {
-      alert(`„${cat.name}" ვერ წაიშლება — მასში ${used} ნაწილია.\n\n` +
+      alert(`„${cat.name}“ ვერ წაიშლება — მასში ${used} ნაწილია.\n\n` +
             `ჯერ გადაიტანე ან წაშალე ეს ნაწილები.`);
       return;
     }
-    if (!confirm(`წავშალოთ კატეგორია „${cat.name}"?`)) return;
+    if (!confirm(`წავშალოთ კატეგორია „${cat.name}“?`)) return;
     state.categories.splice(i, 1);
     save();
     renderCategories();
@@ -297,7 +297,7 @@ function renderParts() {
 
   if (!state.parts.length) {
     partRows.innerHTML =
-      `<p class="rows-empty">ჯერ ნაწილი არ არის. დააჭირე „+ ნაწილი".</p>`;
+      `<p class="rows-empty">ჯერ ნაწილი არ არის. დააჭირე „+ ნაწილი“.</p>`;
     return;
   }
   if (!rows.length) {
@@ -335,7 +335,7 @@ partRows.addEventListener("click", (e) => {
     return;
   }
   if (btn.dataset.action === "delete") {
-    if (!confirm(`წავშალოთ „${state.parts[index].name}"?`)) return;
+    if (!confirm(`წავშალოთ „${state.parts[index].name}“?`)) return;
     state.parts.splice(index, 1);
     save();
     renderParts();
@@ -500,6 +500,170 @@ $("export-copy").addEventListener("click", async () => {
   dirty = false;
   toast("დაკოპირდა");
 });
+
+
+// ── კავშირი GitHub-თან ───────────────────────────────
+const conn = {
+  token: $("gh-token"),
+  owner: $("gh-owner"),
+  repo: $("gh-repo"),
+  branch: $("gh-branch"),
+  result: $("gh-result"),
+};
+
+function fillConnection() {
+  const c = GitHubPublisher.getConfig();
+  conn.token.value = c.token || "";
+  // ცარიელზე მიმდინარე მისამართიდან ვცდილობთ გამოცნობას
+  const guess = /^([^.]+)\.github\.io$/.exec(location.hostname);
+  conn.owner.value = c.owner || (guess ? guess[1] : "");
+  conn.repo.value =
+    c.repo || (guess ? location.pathname.split("/").filter(Boolean)[0] || "" : "");
+  conn.branch.value = c.branch || "main";
+}
+
+function setResult(text, kind) {
+  conn.result.textContent = text;
+  conn.result.className = "conn-result" + (kind ? " " + kind : "");
+}
+
+function readConnection() {
+  return {
+    token: conn.token.value.trim(),
+    owner: conn.owner.value.trim(),
+    repo: conn.repo.value.trim(),
+    branch: conn.branch.value.trim() || "main",
+  };
+}
+
+$("gh-save-config").addEventListener("click", () => {
+  GitHubPublisher.setConfig(readConnection());
+  setResult("პარამეტრები შენახულია", "ok");
+  toast("შენახულია");
+});
+
+$("gh-test").addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  setResult("მოწმდება…");
+  try {
+    const info = await GitHubPublisher.test(readConnection());
+    GitHubPublisher.setConfig(readConnection());
+    setResult(`✓ კავშირი მუშაობს — ${info.full_name}`, "ok");
+  } catch (err) {
+    setResult("✕ " + err.message, "bad");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+$("gh-forget").addEventListener("click", () => {
+  if (!confirm("წავშალოთ თოკენი ამ ბრაუზერიდან?")) return;
+  GitHubPublisher.clearToken();
+  conn.token.value = "";
+  setResult("თოკენი წაშლილია", "ok");
+});
+
+fillConnection();
+
+// ── საიტზე შენახვა ───────────────────────────────────
+// ატვირთული ფოტოები data: URL-ებია. შენახვისას ისინი images/-ში
+// ნამდვილ ფაილებად ჩაიწერება, data.js კი მხოლოდ ბილიკებს შეინახავს —
+// ასე data.js პატარა რჩება.
+const saveDialog = $("save-dialog");
+
+function setStep(text, kind) {
+  $("save-step").textContent = text;
+  $("save-step").className = "save-step" + (kind ? " " + kind : "");
+}
+
+function imageFileName(name, ext) {
+  const stamp = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  return `images/${slugify(name) || "photo"}-${stamp}.${ext}`;
+}
+
+function collectUploads() {
+  // state-ის ასლი, სადაც data: URL-ები ბილიკებით იცვლება
+  const next = JSON.parse(JSON.stringify(state));
+  const files = [];
+
+  const swap = (item) => {
+    if (!GitHubPublisher.isDataUrl(item.image)) return;
+    const { base64, ext } = GitHubPublisher.splitDataUrl(item.image);
+    const path = imageFileName(item.name, ext);
+    files.push({ path, content: base64, encoding: "base64" });
+    item.image = path;
+  };
+
+  next.categories.forEach(swap);
+  next.parts.forEach(swap);
+  return { next, files };
+}
+
+$("save").addEventListener("click", async () => {
+  if (!GitHubPublisher.isConfigured()) {
+    saveDialog.close();
+    for (const t of document.querySelectorAll(".tab")) {
+      const on = t.dataset.tab === "connection";
+      t.setAttribute("aria-pressed", String(on));
+      $("panel-" + t.dataset.tab).hidden = !on;
+    }
+    setResult("ჯერ შეიყვანე თოკენი და შეამოწმე კავშირი", "bad");
+    conn.token.focus();
+    return;
+  }
+
+  $("save-close").hidden = true;
+  $("save-link").hidden = true;
+  setStep("მზადდება…");
+  saveDialog.showModal();
+
+  try {
+    const { next, files } = collectUploads();
+
+    // data.js იგებება უკვე ჩანაცვლებული ბილიკებით
+    const previous = state;
+    state = next;
+    const dataText = buildDataFile();
+    state = previous;
+
+    files.push({
+      path: "data.js",
+      content: GitHubPublisher.encodeText(dataText),
+      encoding: "base64",
+    });
+
+    const photos = files.length - 1;
+    const message = photos
+      ? `კატალოგის განახლება ბექოფისიდან (+${photos} ფოტო)`
+      : "კატალოგის განახლება ბექოფისიდან";
+
+    const commit = await GitHubPublisher.publish({ files, message }, setStep);
+
+    // წარმატების შემდეგ ბილიკები რეალურ state-შიც გადადის
+    state = next;
+    save();
+    dirty = false;
+    renderCategories();
+    renderParts();
+
+    setStep(
+      photos
+        ? `✓ შენახულია — ${photos} ფოტო ატვირთულია.\nსაიტი ერთ წუთში განახლდება.`
+        : "✓ შენახულია. საიტი ერთ წუთში განახლდება.",
+      "ok"
+    );
+    $("save-link").href = commit.url;
+    $("save-link").hidden = false;
+    setStatus("ბოლო შენახვა საიტზე: ახლა");
+  } catch (err) {
+    setStep("✕ " + err.message, "bad");
+  } finally {
+    $("save-close").hidden = false;
+  }
+});
+
+$("save-close").addEventListener("click", () => saveDialog.close());
 
 window.addEventListener("beforeunload", (e) => {
   if (!dirty) return;

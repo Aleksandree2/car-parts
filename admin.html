@@ -19,7 +19,8 @@
       <span class="admin-status" id="status"></span>
       <div class="admin-actions">
         <a class="btn btn-ghost" href="./" target="_blank" rel="noopener">საიტის ნახვა ↗</a>
-        <button class="btn btn-primary" type="button" id="export">data.js ჩამოტვირთვა</button>
+        <button class="btn btn-ghost" type="button" id="export">data.js</button>
+        <button class="btn btn-primary" type="button" id="save">შენახვა საიტზე</button>
       </div>
     </div>
   </header>
@@ -28,6 +29,7 @@
     <button class="tab" type="button" data-tab="site" aria-pressed="true">საიტი</button>
     <button class="tab" type="button" data-tab="categories" aria-pressed="false">კატეგორიები</button>
     <button class="tab" type="button" data-tab="parts" aria-pressed="false">ნაწილები</button>
+    <button class="tab" type="button" data-tab="connection" aria-pressed="false">კავშირი</button>
   </nav>
 
   <main class="wrap admin-main">
@@ -79,6 +81,65 @@
       </div>
 
       <div class="rows" id="part-rows"></div>
+    </section>
+
+
+    <!-- ── კავშირი GitHub-თან ────────────────────────── -->
+    <section class="panel" id="panel-connection" hidden>
+      <h1 class="panel-title">კავშირი GitHub-თან</h1>
+      <p class="panel-hint">
+        ამ პარამეტრებით „შენახვა საიტზე“ ცვლილებებს პირდაპირ რეპოზიტორიაში
+        ჩაწერს და საიტი ერთ წუთში განახლდება.
+      </p>
+
+      <div class="notice">
+        <strong>თოკენი მხოლოდ შენს ბრაუზერში ინახება.</strong>
+        ის არასდროს ხვდება რეპოზიტორიაში და არსად არ იგზავნება GitHub-ის გარდა.
+        საერთო ან უცხო კომპიუტერზე ნუ შეინახავ — დამთავრებისას დააჭირე
+        „თოკენის წაშლა“. ნებისმიერ დროს შეგიძლია გააუქმო
+        <a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">GitHub-ის პარამეტრებში</a>.
+      </div>
+
+      <div class="field">
+        <label for="gh-token">Personal access token</label>
+        <input type="password" id="gh-token" autocomplete="off" spellcheck="false"
+               placeholder="github_pat_…">
+      </div>
+
+      <details class="howto">
+        <summary>როგორ შევქმნა თოკენი</summary>
+        <ol>
+          <li>გახსენი <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Fine-grained token-ის შექმნის გვერდი</a></li>
+          <li><b>Repository access</b> → <b>Only select repositories</b> → აირჩიე <code>car-parts</code></li>
+          <li><b>Repository permissions</b> → <b>Contents</b> → <b>Read and write</b></li>
+          <li><b>Expiration</b> — მიუთითე ვადა (მაგ. 90 დღე), რომ სამუდამოდ არ დარჩეს</li>
+          <li>დააგენერირე, დააკოპირე და ჩასვი ზემოთ</li>
+        </ol>
+        <p>სხვა უფლება არ სჭირდება — მხოლოდ Contents.</p>
+      </details>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="gh-owner">Owner</label>
+          <input type="text" id="gh-owner" spellcheck="false" placeholder="Aleksandree2">
+        </div>
+        <div class="field">
+          <label for="gh-repo">Repository</label>
+          <input type="text" id="gh-repo" spellcheck="false" placeholder="car-parts">
+        </div>
+        <div class="field">
+          <label for="gh-branch">Branch</label>
+          <input type="text" id="gh-branch" spellcheck="false" placeholder="main">
+        </div>
+      </div>
+
+      <div class="dialog-actions" style="justify-content:flex-start">
+        <button class="btn btn-primary" type="button" id="gh-save-config">შენახვა</button>
+        <button class="btn btn-soft" type="button" id="gh-test">კავშირის შემოწმება</button>
+        <button class="btn btn-ghost" type="button" id="gh-forget">თოკენის წაშლა</button>
+      </div>
+
+      <p class="conn-result" id="gh-result"></p>
     </section>
 
   </main>
@@ -147,9 +208,21 @@
     </div>
   </dialog>
 
+  <dialog id="save-dialog" class="dialog">
+    <div class="export-body">
+      <h2 class="dialog-title" id="save-title">საიტზე შენახვა</h2>
+      <p class="save-step" id="save-step"></p>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" type="button" id="save-close" hidden>დახურვა</button>
+        <a class="btn btn-soft" id="save-link" target="_blank" rel="noopener" hidden>კომიტის ნახვა ↗</a>
+      </div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" hidden></div>
 
   <script src="data.js"></script>
+  <script src="publish.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>
