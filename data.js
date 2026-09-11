@@ -5,7 +5,7 @@
 
 // საიტის ზოგადი პარამეტრები
 const SITE = {
-  title: "AutoZona.ge",
+  title: "AutoZona",
   tagline: "ნაწილების კატალოგი",
 };
 
