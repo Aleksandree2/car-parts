@@ -18,6 +18,7 @@ const CATEGORIES = [
   { id: "saburavi", name: "საბურავები და დისკები", image: "" },
   { id: "zeti", name: "ზეთები და სითხეები", image: "" },
   { id: "dzara", name: "ძარა და ოპტიკა", image: "" },
+  { id: "dakidebis-sistema", name: "დაკიდების სისტემა", image: "" },
 ];
 
 const PARTS = [
@@ -160,5 +161,12 @@ const PARTS = [
     price: 1000,
     image: "images/dzravi-mtww2smnaqi3.jpg",
     description: "",
+  },
+  {
+    name: "ქოილოვერი",
+    category: "dakidebis-sistema",
+    price: 500,
+    image: "images/koiloveri-mtxcgfkl72z7.jpg",
+    description: "BMW M4",
   },
 ];
