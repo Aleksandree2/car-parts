@@ -641,12 +641,9 @@ const conn = {
 function fillConnection() {
   const c = GitHubPublisher.getConfig();
   conn.token.value = c.token || "";
-  // ცარიელზე მიმდინარე მისამართიდან ვცდილობთ გამოცნობას
-  const guess = /^([^.]+)\.github\.io$/.exec(location.hostname);
-  conn.owner.value = c.owner || (guess ? guess[1] : "");
-  conn.repo.value =
-    c.repo || (guess ? location.pathname.split("/").filter(Boolean)[0] || "" : "");
-  conn.branch.value = c.branch || "main";
+  conn.owner.value = c.owner;
+  conn.repo.value = c.repo;
+  conn.branch.value = c.branch;
 }
 
 function setResult(text, kind) {
@@ -743,8 +740,14 @@ $("save").addEventListener("click", async () => {
       t.setAttribute("aria-pressed", String(on));
       $("panel-" + t.dataset.tab).hidden = !on;
     }
-    setResult("ჯერ შეიყვანე თოკენი და შეამოწმე კავშირი", "bad");
-    conn.token.focus();
+    const c = GitHubPublisher.getConfig();
+    setResult(
+      !c.token
+        ? "ჯერ შეიყვანე თოკენი და დააჭირე „კავშირის შემოწმება“"
+        : "Owner ან Repository ცარიელია — შეავსე და შეინახე",
+      "bad"
+    );
+    (!c.token ? conn.token : conn.owner).focus();
     return;
   }
 

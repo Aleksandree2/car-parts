@@ -12,7 +12,14 @@ const GitHubPublisher = (() => {
   const API = "https://api.github.com";
 
   // ── კონფიგურაცია ───────────────────────────────────
-  const defaults = { owner: "", repo: "", branch: "main", token: "" };
+  // რეპოზიტორია ცნობილია — ცარიელი ველები მხოლოდ შეცდომის წყარო იყო
+  // (საკუთარ დომენზე მისამართიდან გამოცნობა არ მუშაობს).
+  const defaults = {
+    owner: "Aleksandree2",
+    repo: "car-parts",
+    branch: "main",
+    token: "",
+  };
 
   function getConfig() {
     try {
