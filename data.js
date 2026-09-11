@@ -23,7 +23,7 @@ const CATEGORIES = [
 
 const PARTS = [
   {
-    name: "სამუხრუჭე ხუნდები — წინა",
+    name: "სამუხრუჭე ხუნდები — წინაS",
     category: "muxruchi",
     price: 95,
     image: "images/brake-pads.jpg",
