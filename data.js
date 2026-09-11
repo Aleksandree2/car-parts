@@ -18,7 +18,6 @@ const CATEGORIES = [
   { id: "saburavi", name: "საბურავები და დისკები", image: "" },
   { id: "zeti", name: "ზეთები და სითხეები", image: "" },
   { id: "dzara", name: "ძარა და ოპტიკა", image: "" },
-  { id: "alex", name: "alex", image: "" },
 ];
 
 const PARTS = [
