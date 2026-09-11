@@ -51,4 +51,15 @@ const PARTS = [
     ],
     description: "FR-XH657  SIZES: R19X9.5 J  & R19X11 J\nPCD: 5X114.3 ET: 20 & 25 CB: 73.1 FINISH: MATT MATTE BLACK WITH LIP LINE ALLOY WHEELS FOR NISSAN GTR, FORD MUSTANG, DODGE CHALLENGER, DODGE CHARGER AND LEXUS GS",
   },
+  {
+    name: "TE37 R19 9.5 J 10.5 J Matt Bronze",
+    category: "diskebi",
+    price: 2500,
+    images: [
+      "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5h3p39.jpg",
+      "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hssr4.jpg",
+      "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hi8or.jpg",
+    ],
+    description: "TE37 R19 9.5 J 10.5 J ET:22 (5.112) < (5.113.1)>(5.114.3) Matt Bronze  CB:73.1",
+  },
 ];
