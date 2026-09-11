@@ -9,20 +9,6 @@ const SITE = {
   tagline: "ნაწილების კატალოგი",
 };
 
-// მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)
-const SLIDES = [
-  {
-    image: "images/slide-mtxhpgfbhb3p.jpg",
-    title: "ფასდაკლებაააააააა",
-    link: "",
-  },
-  {
-    image: "images/slide-mtxhtsmbsoyn.jpg",
-    title: "",
-    link: "",
-  },
-];
-
 const CATEGORIES = [
   { id: "dzrava", name: "ძრავი", image: "" },
   { id: "muxruchi", name: "სამუხრუჭე სისტემა", image: "" },
@@ -41,7 +27,6 @@ const PARTS = [
     name: "RAYS 5113 R18 9.5 J 10.5 J Dark Gunmetal",
     category: "diskebi",
     price: 2200,
-    sale: 1500,
     images: [
       "images/5113-lp95-r18-mtxewhmq0kzd.jpg",
     ],
@@ -51,7 +36,6 @@ const PARTS = [
     name: "RAYS 5113 R18 9.5 J 10.5 J Mat Bronze",
     category: "diskebi",
     price: 2200,
-    sale: 0,
     images: [
       "images/rays-5113-mat-bronze-r18-mtxfohpvf2oj.jpg",
     ],
@@ -61,7 +45,6 @@ const PARTS = [
     name: "XH657 R19   9.5J 11J  Mat Black",
     category: "diskebi",
     price: 2500,
-    sale: 0,
     images: [
       "images/xh657-r19-mat-black-mtxg3ql4lybg.jpg",
       "images/xh657-r19-mat-black-mtxg4dzex6g2.jpg",
@@ -72,7 +55,6 @@ const PARTS = [
     name: "TE37 R19 9.5 J 10.5 J Matt Bronze",
     category: "diskebi",
     price: 2500,
-    sale: 0,
     images: [
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hssr4.jpg",
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hi8or.jpg",
@@ -83,12 +65,34 @@ const PARTS = [
     name: "5825A BMW 5X120 R20 8.5 J 9.5 J",
     category: "diskebi",
     price: 2600,
-    sale: 0,
     images: [
       "images/5825a-bmw-5x120-r20-8-5--mtxiltwohebm.jpg",
       "images/5825a-bmw-5x120-r20-8-5--mtxiltwp7smi.jpg",
       "images/5825a-bmw-5x120-r20-8-5--mtxiltwpvjn3.jpg",
     ],
     description: "5825A R20X8.5 J 5X120 ET:25  MB (CB:72.6)\n5825A R20X9.5 J 5X120 ET:40  MB (CB:72.6)",
+  },
+  {
+    name: "5964 BMW 5X120 R19",
+    category: "dzrava",
+    price: 2500,
+    images: [
+      "images/5964-bmw-5x120-r19-mtxjlqc0775d.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc05yaq.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc1ijsf.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc1slzc.jpg",
+      "images/5964-bmw-5x120-r19-mtxjlqc19gfh.jpg",
+    ],
+    description: "5964 BMW 5X120 R19 8J ET:30  R19 9J ET:44 MB (CB.72.6)",
+  },
+  {
+    name: "HF697 RAYS Volk Racing TE 37 R20",
+    category: "diskebi",
+    price: 2900,
+    images: [
+      "images/hf697-rays-volk-racing-t-mtxk6u0gkulr.jpg",
+      "images/hf697-rays-volk-racing-t-mtxk6u0hux7v.jpg",
+    ],
+    description: "RAYS Volk Racing Te37  \nR20 9.5 J   5.114.3 ET:30 MAT BLUE (CB:73.1)\nR20 10.5 J 5.114.3 ET:25 MAT BLUE (CB:73.1)",
   },
 ];
