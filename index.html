@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ავტონაწილები</title>
+  <meta name="description" content="ავტონაწილების კატალოგი — მოძებნე და გაფილტრე კატეგორიების მიხედვით">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="./">
+        <span class="logo-mark" aria-hidden="true">⚙</span>
+        <span>ავტონაწილები</span>
+      </a>
+      <p class="tagline">ნაწილების კატალოგი</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="controls">
+      <label class="search" for="search">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="search" id="search" placeholder="მოძებნე ნაწილი…" autocomplete="off">
+      </label>
+
+      <nav class="filters" id="filters" aria-label="კატეგორიები"></nav>
+    </section>
+
+    <p class="result-count" id="count"></p>
+
+    <section class="grid" id="grid"></section>
+
+    <p class="empty" id="empty" hidden>
+      ვერაფერი მოიძებნა 🙁<br>
+      <span>სცადე სხვა სიტყვა ან აირჩიე „ყველა“</span>
+    </p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© <span id="year"></span> ავტონაწილები</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
