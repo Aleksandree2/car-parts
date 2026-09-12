@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=8">
-  <link rel="stylesheet" href="admin.css?v=8">
-  <script src="theme.js?v=8"></script>
+  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="admin.css?v=9">
+  <script src="theme.js?v=9"></script>
 </head>
 <body class="admin">
 
@@ -260,16 +260,24 @@
       </p>
 
       <div class="dialog-actions" style="justify-content:flex-start">
-        <button class="btn btn-soft" type="button" id="import-pick">ფაილის არჩევა</button>
+        <button class="btn btn-soft" type="button" id="import-pick">1. ცხრილის არჩევა</button>
+        <button class="btn btn-soft" type="button" id="import-photos">2. ფოტოების არჩევა</button>
         <button class="btn btn-ghost" type="button" id="import-template">ნიმუშის ჩამოტვირთვა</button>
       </div>
+
+      <p class="panel-hint">
+        ფოტოების სვეტში ჩაწერე ფაილების სახელები (მაგ.
+        <code>disk1.jpg, disk2.jpg</code>), შემდეგ აირჩიე იგივე ფაილები —
+        სახელით დაემთხვევა. მზა ბილიკი (<code>images/…</code>) და ბმულიც
+        მუშაობს.
+      </p>
 
       <p class="import-status" id="import-status"></p>
 
       <div class="import-preview" id="import-preview" hidden>
         <table class="import-table">
           <thead>
-            <tr><th>#</th><th>დასახელება</th><th>კატეგორია</th><th>ფასი</th><th>სტატუსი</th></tr>
+            <tr><th>#</th><th>დასახელება</th><th>კატეგორია</th><th>ფასი</th><th>ფოტო</th><th>სტატუსი</th></tr>
           </thead>
           <tbody id="import-rows"></tbody>
         </table>
@@ -300,10 +308,10 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="logo.js?v=8"></script>
+  <script src="logo.js?v=9"></script>
   <script src="data.js"></script>
-  <script src="publish.js?v=8"></script>
-  <script src="import.js?v=8"></script>
-  <script src="admin.js?v=8"></script>
+  <script src="publish.js?v=9"></script>
+  <script src="import.js?v=9"></script>
+  <script src="admin.js?v=9"></script>
 </body>
 </html>

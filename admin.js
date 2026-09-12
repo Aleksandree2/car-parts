@@ -630,6 +630,19 @@ $("part-form").addEventListener("submit", () => {
 // ── Excel/CSV იმპორტი ────────────────────────────────
 const importDialog = $("import-dialog");
 let importRows = [];
+let importPhotos = new Map(); // ფაილის სახელი → data URL
+
+const photoKey = (s) => String(s).split(/[\\/]/).pop().trim().toLowerCase();
+
+// ცხრილში ჩაწერილი მნიშვნელობა სამნაირი შეიძლება იყოს
+function resolveImage(token) {
+  const value = String(token).trim();
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return { kind: "url", value };
+  if (value.includes("/")) return { kind: "path", value }; // images/…
+  const hit = importPhotos.get(photoKey(value));
+  return hit ? { kind: "file", value: hit } : null;
+}
 
 function importStatus(text, kind) {
   $("import-status").textContent = text;
@@ -648,6 +661,7 @@ function resetImport() {
 
 $("open-import").addEventListener("click", () => {
   resetImport();
+  importPhotos = new Map();
   importDialog.showModal();
 });
 
@@ -657,9 +671,30 @@ $("import-close").addEventListener("click", () => importDialog.close());
 $("import-create-cats").addEventListener("change", renderImportPreview);
 
 function importProblems(row) {
-  if (!$("import-create-cats").checked) return row.problems;
-  // კატეგორიის შექმნა თუ ჩართულია, მისი არარსებობა პრობლემა აღარაა
-  return row.problems.filter((t) => !t.startsWith("კატეგორია „"));
+  const base = $("import-create-cats").checked
+    // კატეგორიის შექმნა თუ ჩართულია, მისი არარსებობა პრობლემა აღარაა
+    ? row.problems.filter((t) => !t.startsWith("კატეგორია „"))
+    : row.problems.slice();
+
+  // ვერმოძებნილი ფოტო ნაწილს არ აბრკოლებს — მხოლოდ გვაფრთხილებს
+  const missing = row.images.filter((t) => !resolveImage(t));
+  if (missing.length) {
+    base.push(`ფოტო ვერ მოიძებნა: ${missing.join(", ")}`);
+  }
+  return base;
+}
+
+// მხოლოდ ფოტოს პრობლემა დამატებას არ უშლის ხელს
+function blocking(row) {
+  return importProblems(row).filter((t) => !t.startsWith("ფოტო ვერ მოიძებნა"));
+}
+
+function photoCell(row) {
+  if (!row.images.length) return "—";
+  const found = row.images.filter((t) => resolveImage(t)).length;
+  return found === row.images.length
+    ? `${found} ✓`
+    : `${found}/${row.images.length}`;
 }
 
 function renderImportPreview() {
@@ -668,18 +703,19 @@ function renderImportPreview() {
   );
   $("import-create-wrap").hidden = missing.size === 0;
 
-  const ok = importRows.filter((r) => importProblems(r).length === 0);
+  const ok = importRows.filter((r) => blocking(r).length === 0);
 
   $("import-rows").innerHTML = importRows
     .map((r) => {
       const problems = importProblems(r);
-      const good = problems.length === 0;
-      return `<tr class="${good ? "" : "is-bad"}">
+      const stopped = blocking(r).length > 0;
+      return `<tr class="${stopped ? "is-bad" : problems.length ? "is-warn" : ""}">
         <td>${r.line}</td>
         <td>${escapeHtml(r.name || "—")}</td>
         <td>${escapeHtml(r.rawCategory || "—")}</td>
         <td>${r.price || "—"}</td>
-        <td>${good ? "✓" : escapeHtml(problems.join("; "))}</td>
+        <td>${photoCell(r)}</td>
+        <td>${problems.length ? escapeHtml(problems.join("; ")) : "✓"}</td>
       </tr>`;
     })
     .join("");
@@ -691,9 +727,18 @@ function renderImportPreview() {
     : "დამატება";
 
   const bad = importRows.length - ok.length;
+  const wantedPhotos = new Set(
+    importRows.flatMap((r) => r.images).filter((t) => !resolveImage(t))
+  );
+
   importStatus(
     `${importRows.length} სტრიქონი — ${ok.length} მზადაა` +
       (bad ? `, ${bad} პრობლემით (გამოტოვდება)` : "") +
+      (importPhotos.size ? `\nარჩეულია ${importPhotos.size} ფოტო` : "") +
+      (wantedPhotos.size
+        ? `\nვერ მოიძებნა: ${[...wantedPhotos].slice(0, 6).join(", ")}` +
+          (wantedPhotos.size > 6 ? ` და კიდევ ${wantedPhotos.size - 6}` : "")
+        : "") +
       (missing.size && !$("import-create-cats").checked
         ? `\nუცნობი კატეგორია: ${[...missing].join(", ")}`
         : ""),
@@ -732,6 +777,41 @@ $("import-pick").addEventListener("click", () => {
   input.click();
 });
 
+$("import-photos").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.multiple = true;
+  input.style.position = "fixed";
+  input.style.left = "-9999px";
+  document.body.appendChild(input);
+
+  input.addEventListener("change", async () => {
+    const files = Array.from(input.files || []);
+    input.remove();
+    if (!files.length) return;
+
+    importStatus(`ფოტოები მუშავდება… 0/${files.length}`);
+    const failed = [];
+    let done = 0;
+
+    for (const file of files) {
+      try {
+        importPhotos.set(photoKey(file.name), await readImage(file));
+      } catch (err) {
+        failed.push(`${file.name}: ${err.message}`);
+      }
+      importStatus(`ფოტოები მუშავდება… ${++done}/${files.length}`);
+    }
+
+    if (failed.length) alert(failed.join("\n\n"));
+    if (importRows.length) renderImportPreview();
+    else importStatus(`არჩეულია ${importPhotos.size} ფოტო — ახლა ცხრილი აირჩიე`, "ok");
+  });
+  input.addEventListener("cancel", () => input.remove());
+  input.click();
+});
+
 $("import-template").addEventListener("click", () => {
   const text = BulkImport.templateCsv(state.categories);
   const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
@@ -748,7 +828,7 @@ $("import-template").addEventListener("click", () => {
 
 $("import-apply").addEventListener("click", () => {
   const createCats = $("import-create-cats").checked;
-  const ready = importRows.filter((r) => importProblems(r).length === 0);
+  const ready = importRows.filter((r) => blocking(r).length === 0);
   if (!ready.length) return;
 
   let created = 0;
@@ -769,7 +849,12 @@ $("import-apply").addEventListener("click", () => {
       category: row.categoryId,
       price: row.price,
       sale: row.sale,
-      images: row.images,
+      images: row.images
+        .map((token) => {
+          const hit = resolveImage(token);
+          return hit ? hit.value : null;
+        })
+        .filter(Boolean),
       description: row.description,
     });
   }
