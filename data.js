@@ -18,7 +18,7 @@ const SLIDES = [
     align: "center",
     size: "l",
     color: "#fa0000",
-    overlay: 85,
+    overlay: 25,
   },
   {
     image: "images/slide-mtxhtsmbsoyn.jpg",
