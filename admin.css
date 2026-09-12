@@ -679,3 +679,6 @@
 
 /* მხოლოდ ფოტოს პრობლემა — ნაწილი მაინც დაემატება */
 .import-table tr.is-warn td { color: var(--notice-ink); }
+
+.import-fallback { margin: 16px 0 0; max-width: 360px; }
+.import-fallback .panel-hint { margin: 6px 0 0; }

@@ -6,12 +6,14 @@
 const BulkImport = (() => {
   // სვეტის სახელები — ქართულიც და ინგლისურიც
   const COLUMNS = {
-    name: ["დასახელება", "სახელი", "name", "title", "product"],
+    name: ["დასახელება", "სახელი", "name", "title", "product", "model",
+           "车型", "车型/car", "car", "名称", "产品", "品名"],
     category: ["კატეგორია", "category", "cat"],
-    price: ["ფასი", "price", "cost"],
+    price: ["ფასი", "price", "cost", "单价", "价格", "unit price"],
     sale: ["ფასდაკლება", "ფასდაკლებული", "ფასდაკლებული ფასი", "sale", "discount"],
-    description: ["აღწერა", "description", "desc", "info"],
-    images: ["ფოტო", "ფოტოები", "სურათი", "სურათები", "image", "images", "photo", "photos"],
+    description: ["აღწერა", "description", "desc", "info", "备注", "remark"],
+    images: ["ფოტო", "ფოტოები", "სურათი", "სურათები", "image", "images",
+             "photo", "photos", "picture", "图片", "picture /图片"],
   };
 
   const norm = (s) => String(s == null ? "" : s).trim().toLowerCase();
@@ -58,6 +60,77 @@ const BulkImport = (() => {
     return rows.filter((r) => r.some((c) => String(c).trim() !== ""));
   }
 
+
+  // ── xlsx-ში ჩაშენებული სურათები ──────────────────────
+  // ისინი zip-ის შიგნით ცალკე ფაილებადაა, უჯრებთან კი drawing XML-ით
+  // არის მიბმული: <xdr:from><xdr:row>N</xdr:row> → r:embed="rIdX" → media.
+  const MIME = {
+    png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg",
+    gif: "image/gif", webp: "image/webp", bmp: "image/bmp",
+  };
+
+  const decode = (content) =>
+    typeof content === "string"
+      ? content
+      : new TextDecoder("utf-8").decode(new Uint8Array(content));
+
+  function pickDrawing(files) {
+    const drawings = Object.keys(files).filter((k) =>
+      /^xl\/drawings\/drawing\d+\.xml$/.test(k)
+    );
+    return drawings.length ? drawings.sort()[0] : null;
+  }
+
+  // sheetRow (1-დან) → [{ name, bytes, mime }]
+  function extractMedia(wb) {
+    const files = wb.files || {};
+    const drawingPath = pickDrawing(files);
+    if (!drawingPath || !files[drawingPath]) return new Map();
+
+    const relsPath = drawingPath.replace(
+      /drawings\/(drawing\d+\.xml)$/,
+      "drawings/_rels/$1.rels"
+    );
+    if (!files[relsPath]) return new Map();
+
+    // rId → media ფაილის სახელი
+    const rels = new Map();
+    const relsXml = decode(files[relsPath].content);
+    for (const m of relsXml.matchAll(/Id="([^"]+)"[^>]*Target="([^"]+)"/g)) {
+      rels.set(m[1], m[2].replace(/^\.\.\//, "xl/"));
+    }
+
+    const byRow = new Map();
+    const xml = decode(files[drawingPath].content);
+
+    for (const anchor of xml.matchAll(
+      /<xdr:(twoCellAnchor|oneCellAnchor)[\s\S]*?<\/xdr:\1>/g
+    )) {
+      const frag = anchor[0];
+      const from = frag.match(/<xdr:from>([\s\S]*?)<\/xdr:from>/);
+      const rowMatch = from && from[1].match(/<xdr:row>(\d+)<\/xdr:row>/);
+      const embed = frag.match(/r:embed="([^"]+)"/);
+      if (!rowMatch || !embed) continue;
+
+      const target = rels.get(embed[1]);
+      const entry = target && files[target];
+      if (!entry || !entry.content) continue;
+
+      const ext = (target.split(".").pop() || "").toLowerCase();
+      const mime = MIME[ext];
+      if (!mime) continue; // emf/wmf და მისთანები ბრაუზერს არ ესმის
+
+      const sheetRow = Number(rowMatch[1]) + 1; // XML 0-დან ითვლის
+      if (!byRow.has(sheetRow)) byRow.set(sheetRow, []);
+      byRow.get(sheetRow).push({
+        name: target.split("/").pop(),
+        bytes: entry.content,
+        mime,
+      });
+    }
+    return byRow;
+  }
+
   // ── XLSX ─────────────────────────────────────────────
   let xlsxLoading = null;
 
@@ -79,22 +152,36 @@ const BulkImport = (() => {
   async function parseXlsx(file) {
     const XLSX = await loadXlsx();
     const buffer = await file.arrayBuffer();
-    const book = XLSX.read(buffer, { type: "array" });
+    // bookFiles — zip-ის ნედლი ნაწილები, სურათებისთვის საჭირო
+    const book = XLSX.read(new Uint8Array(buffer), { type: "array", bookFiles: true });
     const sheet = book.Sheets[book.SheetNames[0]];
     if (!sheet) throw new Error("ფაილში ფურცელი ვერ მოიძებნა");
-    return XLSX.utils
-      .sheet_to_json(sheet, { header: 1, blankrows: false, defval: "" })
-      .filter((r) => r.some((c) => String(c).trim() !== ""));
+
+    // blankrows: true — თორემ სტრიქონების ნომრები აირევა და სურათები
+    // სხვა ნაწილს მიება
+    const grid = XLSX.utils.sheet_to_json(sheet, {
+      header: 1,
+      blankrows: true,
+      defval: "",
+    });
+    return { grid, media: extractMedia(book) };
   }
 
   // ── ფაილის წაკითხვა ──────────────────────────────────
   async function readFile(file) {
     const isCsv = /\.(csv|txt)$/i.test(file.name);
-    const rows = isCsv ? parseCsv(await file.text()) : await parseXlsx(file);
+    let grid, media;
 
-    if (!rows.length) throw new Error("ფაილი ცარიელია");
+    if (isCsv) {
+      grid = parseCsv(await file.text());
+      media = new Map();
+    } else {
+      ({ grid, media } = await parseXlsx(file));
+    }
 
-    const headers = rows[0].map((h) => String(h));
+    if (!grid.length) throw new Error("ფაილი ცარიელია");
+
+    const headers = grid[0].map((h) => String(h));
     const map = headerMap(headers);
     if (map.name === undefined) {
       throw new Error(
@@ -104,36 +191,53 @@ const BulkImport = (() => {
         `ნაპოვნი სვეტები: ${headers.join(", ")}`
       );
     }
-    return { headers, map, body: rows.slice(1) };
+    // სტრიქონის ნომერი შენარჩუნებულია, რომ სურათი სწორ ნაწილს მიება
+    const body = grid
+      .map((cells, i) => ({ cells, sheetRow: i + 1 }))
+      .slice(1)
+      .filter((r) => r.cells.some((c) => String(c).trim() !== ""));
+
+    return { headers, map, body, media, hasCategoryColumn: map.category !== undefined };
   }
 
   // ── სტრიქონების გადამუშავება ─────────────────────────
   // categories: [{id, name}] — კატეგორია სახელითაც და id-თაც იძებნება
-  function mapRows({ map, body }, categories) {
+  function mapRows({ map, body, media }, categories, fallbackCategoryId) {
     const byKey = new Map();
     for (const c of categories) {
       byKey.set(norm(c.id), c.id);
       byKey.set(norm(c.name), c.id);
     }
 
-    const at = (row, field) =>
-      map[field] === undefined ? "" : String(row[map[field]] == null ? "" : row[map[field]]).trim();
+    const at = (cells, field) =>
+      map[field] === undefined ? "" : String(cells[map[field]] == null ? "" : cells[map[field]]).trim();
 
-    return body.map((row, i) => {
+    return body.map(({ cells: row, sheetRow }) => {
       const name = at(row, "name");
       const rawCategory = at(row, "category");
       const priceText = at(row, "price").replace(/[^\d.,-]/g, "").replace(",", ".");
       const saleText = at(row, "sale").replace(/[^\d.,-]/g, "").replace(",", ".");
 
+      // სურათის უჯრაში ხშირად ნაგავია (მაგ. „·“, როცა სურათი უჯრის
+      // თავზე ცურავს). ფაილის სახელად ჩაითვლება მხოლოდ ის, რასაც
+      // გაფართოება აქვს, ბმულია ან ბილიკს ჰგავს.
+      const looksLikeFile = (t) =>
+        /^https?:\/\//i.test(t) ||
+        t.includes("/") ||
+        /\.[a-z0-9]{2,4}$/i.test(t);
+
       const images = at(row, "images")
         .split(/[,;\n|]/)
         .map((s) => s.trim())
-        .filter(Boolean);
+        .filter((t) => t && looksLikeFile(t));
+
+      const embedded = (media && media.get(sheetRow)) || [];
 
       const item = {
-        line: i + 2, // +1 სათაური, +1 რომ 1-დან იწყებოდეს
+        line: sheetRow,
+        embedded,
         name,
-        categoryId: byKey.get(norm(rawCategory)) || "",
+        categoryId: byKey.get(norm(rawCategory)) || fallbackCategoryId || "",
         rawCategory,
         price: Number(priceText) || 0,
         sale: Number(saleText) || 0,
@@ -143,8 +247,13 @@ const BulkImport = (() => {
       };
 
       if (!item.name) item.problems.push("დასახელება ცარიელია");
-      if (!rawCategory) item.problems.push("კატეგორია ცარიელია");
-      else if (!item.categoryId) item.problems.push(`კატეგორია „${rawCategory}“ არ არსებობს`);
+      if (!item.categoryId) {
+        item.problems.push(
+          rawCategory
+            ? `კატეგორია „${rawCategory}“ არ არსებობს`
+            : "კატეგორია ცარიელია"
+        );
+      }
       if (!item.price) item.problems.push("ფასი ცარიელია ან არასწორია");
       if (item.sale && item.sale >= item.price) {
         item.problems.push("ფასდაკლება ფასზე მეტია");

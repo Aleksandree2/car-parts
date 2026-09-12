@@ -631,6 +631,7 @@ $("part-form").addEventListener("submit", () => {
 const importDialog = $("import-dialog");
 let importRows = [];
 let importPhotos = new Map(); // ფაილის სახელი → data URL
+let importParsed = null;       // წაკითხული ფაილი, კატეგორიის შესაცვლელად
 
 const photoKey = (s) => String(s).split(/[\\/]/).pop().trim().toLowerCase();
 
@@ -651,6 +652,8 @@ function importStatus(text, kind) {
 
 function resetImport() {
   importRows = [];
+  importParsed = null;
+  $("import-fallback-wrap").hidden = true;
   $("import-preview").hidden = true;
   $("import-rows").innerHTML = "";
   $("import-create-wrap").hidden = true;
@@ -669,6 +672,17 @@ $("import-close").addEventListener("click", () => importDialog.close());
 
 // უცნობი კატეგორიების შექმნა სტატუსს ცვლის, ამიტომ თავიდან ვხატავთ
 $("import-create-cats").addEventListener("change", renderImportPreview);
+
+// ფაილში კატეგორიის სვეტი თუ არ არის, ყველა სტრიქონს ერთი ეძლევა
+$("import-fallback").addEventListener("change", () => {
+  if (!importParsed) return;
+  importRows = BulkImport.mapRows(
+    importParsed,
+    state.categories,
+    $("import-fallback").value
+  );
+  renderImportPreview();
+});
 
 function importProblems(row) {
   const base = $("import-create-cats").checked
@@ -690,11 +704,13 @@ function blocking(row) {
 }
 
 function photoCell(row) {
-  if (!row.images.length) return "—";
-  const found = row.images.filter((t) => resolveImage(t)).length;
-  return found === row.images.length
-    ? `${found} ✓`
-    : `${found}/${row.images.length}`;
+  const embedded = (row.embedded || []).length;
+  const named = row.images.filter((t) => resolveImage(t)).length;
+  const total = embedded + row.images.length;
+
+  if (!total) return "—";
+  const found = embedded + named;
+  return found === total ? `${found} ✓` : `${found}/${total}`;
 }
 
 function renderImportPreview() {
@@ -763,11 +779,46 @@ $("import-pick").addEventListener("click", () => {
     importStatus(`იკითხება ${file.name}…`);
     try {
       const parsed = await BulkImport.readFile(file);
-      importRows = BulkImport.mapRows(parsed, state.categories);
+      importParsed = parsed;
+
+      // კატეგორიის სვეტის გარეშე ერთი კატეგორია უნდა აირჩეს
+      const needsFallback = !parsed.hasCategoryColumn && state.categories.length > 0;
+      $("import-fallback-wrap").hidden = !needsFallback;
+      if (needsFallback) {
+        $("import-fallback").innerHTML = state.categories
+          .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`)
+          .join("");
+      }
+
+      importRows = BulkImport.mapRows(
+        parsed,
+        state.categories,
+        needsFallback ? $("import-fallback").value : ""
+      );
       if (!importRows.length) {
         importStatus("ფაილში სტრიქონები ვერ მოიძებნა", "warn");
         return;
       }
+
+      // ფაილში ჩაშენებული სურათები — ბრაუზერს ისინი ისედაც აქვს
+      const withImages = importRows.filter((r) => (r.embedded || []).length);
+      if (withImages.length) {
+        importStatus(`ფაილის სურათები მუშავდება… 0/${withImages.length}`);
+        let done = 0;
+        for (const row of withImages) {
+          row.embeddedUrls = [];
+          for (const pic of row.embedded) {
+            try {
+              const blob = new File([pic.bytes], pic.name, { type: pic.mime });
+              row.embeddedUrls.push(await readImage(blob));
+            } catch (e) {
+              /* ერთი გაფუჭებული სურათი დანარჩენს არ აჩერებს */
+            }
+          }
+          importStatus(`ფაილის სურათები მუშავდება… ${++done}/${withImages.length}`);
+        }
+      }
+
       renderImportPreview();
     } catch (err) {
       importStatus("✕ " + err.message, "bad");
@@ -849,12 +900,15 @@ $("import-apply").addEventListener("click", () => {
       category: row.categoryId,
       price: row.price,
       sale: row.sale,
-      images: row.images
-        .map((token) => {
-          const hit = resolveImage(token);
-          return hit ? hit.value : null;
-        })
-        .filter(Boolean),
+      images: [
+        ...(row.embeddedUrls || []),
+        ...row.images
+          .map((token) => {
+            const hit = resolveImage(token);
+            return hit ? hit.value : null;
+          })
+          .filter(Boolean),
+      ],
       description: row.description,
     });
   }
