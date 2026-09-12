@@ -15,11 +15,19 @@ const SLIDES = [
     image: "images/slide-mtxhpgfbhb3p.jpg",
     title: "ფასდაკლებაააააააა",
     link: "",
+    align: "center",
+    size: "l",
+    color: "#fa0000",
+    overlay: 85,
   },
   {
     image: "images/slide-mtxhtsmbsoyn.jpg",
     title: "",
     link: "",
+    align: "center",
+    size: "m",
+    color: "#ffffff",
+    overlay: 35,
   },
 ];
 
