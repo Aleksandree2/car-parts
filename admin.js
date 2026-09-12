@@ -627,6 +627,164 @@ $("part-form").addEventListener("submit", () => {
   toast(editingIndex < 0 ? "ნაწილი დაემატა" : "შენახულია");
 });
 
+// ── Excel/CSV იმპორტი ────────────────────────────────
+const importDialog = $("import-dialog");
+let importRows = [];
+
+function importStatus(text, kind) {
+  $("import-status").textContent = text;
+  $("import-status").className = "import-status" + (kind ? " " + kind : "");
+}
+
+function resetImport() {
+  importRows = [];
+  $("import-preview").hidden = true;
+  $("import-rows").innerHTML = "";
+  $("import-create-wrap").hidden = true;
+  $("import-create-cats").checked = false;
+  $("import-apply").disabled = true;
+  importStatus("");
+}
+
+$("open-import").addEventListener("click", () => {
+  resetImport();
+  importDialog.showModal();
+});
+
+$("import-close").addEventListener("click", () => importDialog.close());
+
+// უცნობი კატეგორიების შექმნა სტატუსს ცვლის, ამიტომ თავიდან ვხატავთ
+$("import-create-cats").addEventListener("change", renderImportPreview);
+
+function importProblems(row) {
+  if (!$("import-create-cats").checked) return row.problems;
+  // კატეგორიის შექმნა თუ ჩართულია, მისი არარსებობა პრობლემა აღარაა
+  return row.problems.filter((t) => !t.startsWith("კატეგორია „"));
+}
+
+function renderImportPreview() {
+  const missing = new Set(
+    importRows.filter((r) => !r.categoryId && r.rawCategory).map((r) => r.rawCategory)
+  );
+  $("import-create-wrap").hidden = missing.size === 0;
+
+  const ok = importRows.filter((r) => importProblems(r).length === 0);
+
+  $("import-rows").innerHTML = importRows
+    .map((r) => {
+      const problems = importProblems(r);
+      const good = problems.length === 0;
+      return `<tr class="${good ? "" : "is-bad"}">
+        <td>${r.line}</td>
+        <td>${escapeHtml(r.name || "—")}</td>
+        <td>${escapeHtml(r.rawCategory || "—")}</td>
+        <td>${r.price || "—"}</td>
+        <td>${good ? "✓" : escapeHtml(problems.join("; "))}</td>
+      </tr>`;
+    })
+    .join("");
+
+  $("import-preview").hidden = false;
+  $("import-apply").disabled = ok.length === 0;
+  $("import-apply").textContent = ok.length
+    ? `დაამატე ${ok.length} ნაწილი`
+    : "დამატება";
+
+  const bad = importRows.length - ok.length;
+  importStatus(
+    `${importRows.length} სტრიქონი — ${ok.length} მზადაა` +
+      (bad ? `, ${bad} პრობლემით (გამოტოვდება)` : "") +
+      (missing.size && !$("import-create-cats").checked
+        ? `\nუცნობი კატეგორია: ${[...missing].join(", ")}`
+        : ""),
+    bad ? "warn" : "ok"
+  );
+}
+
+$("import-pick").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".xlsx,.xls,.csv,.txt";
+  input.style.position = "fixed";
+  input.style.left = "-9999px";
+  document.body.appendChild(input);
+
+  input.addEventListener("change", async () => {
+    const file = input.files && input.files[0];
+    input.remove();
+    if (!file) return;
+
+    resetImport();
+    importStatus(`იკითხება ${file.name}…`);
+    try {
+      const parsed = await BulkImport.readFile(file);
+      importRows = BulkImport.mapRows(parsed, state.categories);
+      if (!importRows.length) {
+        importStatus("ფაილში სტრიქონები ვერ მოიძებნა", "warn");
+        return;
+      }
+      renderImportPreview();
+    } catch (err) {
+      importStatus("✕ " + err.message, "bad");
+    }
+  });
+  input.addEventListener("cancel", () => input.remove());
+  input.click();
+});
+
+$("import-template").addEventListener("click", () => {
+  const text = BulkImport.templateCsv(state.categories);
+  const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "autozona-nimushi.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("ნიმუში ჩამოიტვირთა — შეავსე Excel-ში და დააბრუნე");
+});
+
+$("import-apply").addEventListener("click", () => {
+  const createCats = $("import-create-cats").checked;
+  const ready = importRows.filter((r) => importProblems(r).length === 0);
+  if (!ready.length) return;
+
+  let created = 0;
+  for (const row of ready) {
+    if (!row.categoryId && createCats && row.rawCategory) {
+      const id = uniqueId(row.rawCategory);
+      state.categories.push({ id, name: row.rawCategory, image: "" });
+      // იმავე სახელის დანარჩენ სტრიქონებსაც მიება
+      for (const other of importRows) {
+        if (!other.categoryId && other.rawCategory === row.rawCategory) {
+          other.categoryId = id;
+        }
+      }
+      created++;
+    }
+    state.parts.push({
+      name: row.name,
+      category: row.categoryId,
+      price: row.price,
+      sale: row.sale,
+      images: row.images,
+      description: row.description,
+    });
+  }
+
+  save();
+  renderCategories();
+  renderParts();
+  importDialog.close();
+  toast(
+    `დაემატა ${ready.length} ნაწილი` +
+      (created ? ` და ${created} კატეგორია` : "") +
+      " — დააჭირე „შენახვა საიტზე“"
+  );
+});
+
 // ── data.js-ის გენერაცია ─────────────────────────────
 function buildDataFile() {
   const q = (s) => JSON.stringify(String(s));

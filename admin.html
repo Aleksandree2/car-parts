@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=7">
-  <link rel="stylesheet" href="admin.css?v=7">
-  <script src="theme.js?v=7"></script>
+  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="admin.css?v=8">
+  <script src="theme.js?v=8"></script>
 </head>
 <body class="admin">
 
@@ -94,7 +94,10 @@
           <h1 class="panel-title">ნაწილები</h1>
           <p class="panel-hint" id="parts-hint"></p>
         </div>
-        <button class="btn btn-primary" type="button" id="add-part">+ ნაწილი</button>
+        <div class="head-actions">
+          <button class="btn btn-soft" type="button" id="open-import">Excel-იდან</button>
+          <button class="btn btn-primary" type="button" id="add-part">+ ნაწილი</button>
+        </div>
       </div>
 
       <div class="parts-toolbar">
@@ -244,6 +247,46 @@
     </div>
   </dialog>
 
+  <!-- ── Excel/CSV იმპორტი ───────────────────────────── -->
+  <dialog id="import-dialog" class="dialog">
+    <div class="export-body">
+      <h2 class="dialog-title">ნაწილების იმპორტი</h2>
+
+      <p class="panel-hint">
+        Excel (.xlsx) ან CSV ფაილი, სადაც პირველი სტრიქონი სვეტების
+        სახელებია: <code>დასახელება</code>, <code>კატეგორია</code>,
+        <code>ფასი</code>, <code>ფასდაკლება</code>, <code>აღწერა</code>,
+        <code>ფოტოები</code>. სავალდებულოა მხოლოდ დასახელება, კატეგორია და ფასი.
+      </p>
+
+      <div class="dialog-actions" style="justify-content:flex-start">
+        <button class="btn btn-soft" type="button" id="import-pick">ფაილის არჩევა</button>
+        <button class="btn btn-ghost" type="button" id="import-template">ნიმუშის ჩამოტვირთვა</button>
+      </div>
+
+      <p class="import-status" id="import-status"></p>
+
+      <div class="import-preview" id="import-preview" hidden>
+        <table class="import-table">
+          <thead>
+            <tr><th>#</th><th>დასახელება</th><th>კატეგორია</th><th>ფასი</th><th>სტატუსი</th></tr>
+          </thead>
+          <tbody id="import-rows"></tbody>
+        </table>
+      </div>
+
+      <label class="import-option" id="import-create-wrap" hidden>
+        <input type="checkbox" id="import-create-cats">
+        <span>უცნობი კატეგორიები ავტომატურად შეიქმნას</span>
+      </label>
+
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" type="button" id="import-close">დახურვა</button>
+        <button class="btn btn-primary" type="button" id="import-apply" disabled>დამატება</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="save-dialog" class="dialog">
     <div class="export-body">
       <h2 class="dialog-title" id="save-title">საიტზე შენახვა</h2>
@@ -257,9 +300,10 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="logo.js?v=7"></script>
+  <script src="logo.js?v=8"></script>
   <script src="data.js"></script>
-  <script src="publish.js?v=7"></script>
-  <script src="admin.js?v=7"></script>
+  <script src="publish.js?v=8"></script>
+  <script src="import.js?v=8"></script>
+  <script src="admin.js?v=8"></script>
 </body>
 </html>
