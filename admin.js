@@ -232,27 +232,64 @@ function renderSlides() {
       `<p class="rows-empty">სლაიდი არ არის. დააჭირე „+ სლაიდი“.</p>`;
     return;
   }
+
+  const opt = (value, current, label) =>
+    `<option value="${value}"${value === current ? " selected" : ""}>${label}</option>`;
+
   slideRows.innerHTML = list
-    .map((sl, i) => `
-      <div class="row" data-index="${i}">
-        ${thumb(sl.image, "🖼")}
-        <div class="row-main">
-          <input type="text" value="${escapeHtml(sl.title || "")}"
-                 data-slide="title" placeholder="წარწერა (არასავალდებულო)"
-                 aria-label="სლაიდის წარწერა">
-          <input type="text" value="${escapeHtml(sl.link || "")}"
-                 data-slide="link" placeholder="ბმული (არასავალდებულო)"
-                 aria-label="სლაიდის ბმული">
+    .map((sl, i) => {
+      const align = sl.align || "center";
+      const size = sl.size || "m";
+      const color = sl.color || "#ffffff";
+      const overlay = sl.overlay === undefined ? 35 : Number(sl.overlay);
+
+      return `
+      <div class="row slide-row" data-index="${i}">
+        <div class="slide-main">
+          ${thumb(sl.image, "🖼")}
+          <div class="row-main">
+            <input type="text" value="${escapeHtml(sl.title || "")}"
+                   data-slide="title" placeholder="წარწერა (არასავალდებულო)"
+                   aria-label="სლაიდის წარწერა">
+            <input type="text" value="${escapeHtml(sl.link || "")}"
+                   data-slide="link" placeholder="ბმული (არასავალდებულო)"
+                   aria-label="სლაიდის ბმული">
+          </div>
+          <div class="row-tools">
+            <button class="btn-icon" type="button" data-slide-act="up"
+                    ${i === 0 ? "disabled" : ""} title="ზემოთ">↑</button>
+            <button class="btn-icon" type="button" data-slide-act="down"
+                    ${i === list.length - 1 ? "disabled" : ""} title="ქვემოთ">↓</button>
+            <button class="btn-icon" type="button" data-slide-act="photo" title="ფოტო">📷</button>
+            <button class="btn-icon danger" type="button" data-slide-act="delete" title="წაშლა">✕</button>
+          </div>
         </div>
-        <div class="row-tools">
-          <button class="btn-icon" type="button" data-slide-act="up"
-                  ${i === 0 ? "disabled" : ""} title="ზემოთ">↑</button>
-          <button class="btn-icon" type="button" data-slide-act="down"
-                  ${i === list.length - 1 ? "disabled" : ""} title="ქვემოთ">↓</button>
-          <button class="btn-icon" type="button" data-slide-act="photo" title="ფოტო">📷</button>
-          <button class="btn-icon danger" type="button" data-slide-act="delete" title="წაშლა">✕</button>
+
+        <div class="slide-style">
+          <label>ადგილი
+            <select class="select" data-slide="align">
+              ${opt("center", align, "შუაში")}
+              ${opt("top", align, "ზემოთ")}
+              ${opt("bottom", align, "ქვემოთ")}
+            </select>
+          </label>
+          <label>ზომა
+            <select class="select" data-slide="size">
+              ${opt("s", size, "პატარა")}
+              ${opt("m", size, "საშუალო")}
+              ${opt("l", size, "დიდი")}
+            </select>
+          </label>
+          <label>ფერი
+            <input type="color" value="${escapeHtml(color)}" data-slide="color">
+          </label>
+          <label class="slide-overlay-field">ჩაბნელება <b>${overlay}%</b>
+            <input type="range" min="0" max="90" step="5" value="${overlay}"
+                   data-slide="overlay">
+          </label>
         </div>
-      </div>`)
+      </div>`;
+    })
     .join("");
 }
 
@@ -286,18 +323,38 @@ slideRows.addEventListener("click", async (e) => {
   }
 });
 
-slideRows.addEventListener("input", (e) => {
-  const input = e.target.closest("input[data-slide]");
-  if (!input) return;
-  const i = Number(input.closest(".row").dataset.index);
-  state.slides[i][input.dataset.slide] = input.value;
+function onSlideField(e) {
+  const field = e.target.closest("[data-slide]");
+  if (!field) return;
+  const row = field.closest(".slide-row");
+  const i = Number(row.dataset.index);
+  const key = field.dataset.slide;
+
+  state.slides[i][key] = key === "overlay" ? Number(field.value) : field.value;
   save();
-});
+
+  // ჩაბნელების პროცენტი გვერდით უნდა განახლდეს, სხვა არაფერი
+  if (key === "overlay") {
+    const label = row.querySelector(".slide-overlay-field b");
+    if (label) label.textContent = `${field.value}%`;
+  }
+}
+
+slideRows.addEventListener("input", onSlideField);
+slideRows.addEventListener("change", onSlideField);
 
 $("add-slide").addEventListener("click", async () => {
   const [image] = await pickImages();
   if (!image) return;
-  state.slides.push({ image, title: "", link: "" });
+  state.slides.push({
+    image,
+    title: "",
+    link: "",
+    align: "center",
+    size: "m",
+    color: "#ffffff",
+    overlay: 35,
+  });
   save();
   renderSlides();
   toast("სლაიდი დაემატა");
@@ -934,6 +991,10 @@ function buildDataFile() {
       `    image: ${q(sl.image || "")},`,
       `    title: ${q(sl.title || "")},`,
       `    link: ${q(sl.link || "")},`,
+      `    align: ${q(sl.align || "center")},`,
+      `    size: ${q(sl.size || "m")},`,
+      `    color: ${q(sl.color || "#ffffff")},`,
+      `    overlay: ${sl.overlay === undefined ? 35 : Number(sl.overlay)},`,
       "  },",
     ].join("\n"))
     .join("\n");

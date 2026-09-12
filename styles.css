@@ -587,17 +587,34 @@ body {
   object-fit: cover;
 }
 
-.slide-title {
+/* ── სლაიდის წარწერა ─────────────────────────────────── */
+.slide-overlay {
   position: absolute;
-  inset-inline-start: 0;
-  bottom: 0;
-  width: 100%;
-  padding: 34px 22px 16px;
-  font-size: 19px;
-  font-weight: 700;
-  color: #fff;
-  background: linear-gradient(transparent, rgba(0, 0, 0, .72));
+  inset: 0;
+  pointer-events: none;
 }
+
+.slide-caption {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  padding: 6% 8%;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .55);
+  pointer-events: none;
+}
+
+.slide-caption.align-center { align-items: center; }
+.slide-caption.align-top { align-items: flex-start; }
+.slide-caption.align-bottom { align-items: flex-end; }
+
+.slide-caption.size-s { font-size: clamp(14px, 2.2vw, 20px); }
+.slide-caption.size-m { font-size: clamp(18px, 3.4vw, 32px); }
+.slide-caption.size-l { font-size: clamp(24px, 5vw, 52px); }
 
 .slider-nav {
   position: absolute;
@@ -648,7 +665,7 @@ body {
 
 @media (max-width: 520px) {
   .slide img { aspect-ratio: 16 / 9; }
-  .slide-title { font-size: 15px; padding: 26px 14px 12px; }
+  .slide-caption { padding: 8% 6%; }
   .slider-nav { width: 34px; height: 34px; font-size: 20px; }
 }
 

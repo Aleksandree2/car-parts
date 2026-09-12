@@ -31,6 +31,10 @@ function placeholder() {
   );
 }
 
+const esc = (v) =>
+  String(v == null ? "" : v).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
 // ნაწილს შეიძლება ჰქონდეს images: [...] (ახალი) ან image: "..." (ძველი)
 const imagesOf = (item) =>
   Array.isArray(item.images)
@@ -128,9 +132,9 @@ function render() {
           }
           return `<button class="card-media is-zoomable" type="button"
                           data-zoom="${encodeURIComponent(JSON.stringify(photos))}"
-                          data-name="${p.name}"
-                          aria-label="${p.name} — სურათების ნახვა">
-                    <img src="${photos[0]}" alt="${p.name}" loading="lazy"
+                          data-name="${esc(p.name)}"
+                          aria-label="${esc(p.name)} — სურათების ნახვა">
+                    <img src="${esc(photos[0])}" alt="${esc(p.name)}" loading="lazy"
                          onerror="this.onerror=null; this.src='${fallback}'">
                     ${photos.length > 1
                       ? `<span class="photo-count">🖼 ${photos.length}</span>`
@@ -141,9 +145,9 @@ function render() {
                   </button>`;
         })()}
         <div class="card-body">
-          <span class="card-cat">${categoryName(p.category)}</span>
-          <h2 class="card-title">${p.name}</h2>
-          <p class="card-desc">${p.description || ""}</p>
+          <span class="card-cat">${esc(categoryName(p.category))}</span>
+          <h2 class="card-title">${esc(p.name)}</h2>
+          <p class="card-desc">${esc(p.description || "")}</p>
           ${priceBlock(p)}
         </div>
       </article>`
@@ -261,10 +265,20 @@ function renderSlider() {
   slider.hidden = false;
   sliderTrack.innerHTML = slides
     .map((sl) => {
-      const inner = `<img src="${sl.image}" alt="${sl.title || ""}" loading="lazy">
-                     ${sl.title ? `<span class="slide-title">${sl.title}</span>` : ""}`;
+      const align = ["top", "center", "bottom"].includes(sl.align) ? sl.align : "center";
+      const size = ["s", "m", "l"].includes(sl.size) ? sl.size : "m";
+      const color = /^#[0-9a-f]{3,8}$/i.test(sl.color || "") ? sl.color : "#ffffff";
+      const overlay = Math.min(90, Math.max(0, Number(sl.overlay) || 0)) / 100;
+
+      const caption = sl.title
+        ? `<div class="slide-overlay" style="background: rgba(0,0,0,${overlay})"></div>
+           <div class="slide-caption align-${align} size-${size}"
+                style="color: ${esc(color)}"><span>${esc(sl.title)}</span></div>`
+        : "";
+
+      const inner = `<img src="${esc(sl.image)}" alt="${esc(sl.title || "")}" loading="lazy">${caption}`;
       return sl.link
-        ? `<a class="slide" href="${sl.link}" rel="noopener">${inner}</a>`
+        ? `<a class="slide" href="${esc(sl.link)}" rel="noopener">${inner}</a>`
         : `<div class="slide">${inner}</div>`;
     })
     .join("");
