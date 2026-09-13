@@ -67,7 +67,26 @@ if (typeof SITE === "object" && SITE) {
   if (SITE.title) {
     document.getElementById("site-title").textContent = SITE.title;
     document.getElementById("site-title-footer").textContent = SITE.title;
-    document.title = SITE.title;
+  }
+
+  // საძიებო სათაური ცალკეა: SITE.title მოკლეა ლოგოსთვის, Google-ს კი
+  // აღწერითი სჭირდება. თუ ცარიელია, სათაური + ქვესათაური გამოიყენება.
+  const seoTitle =
+    SITE.seoTitle || [SITE.title, SITE.tagline].filter(Boolean).join(" — ");
+  const seoDescription = SITE.seoDescription || "";
+
+  if (seoTitle) {
+    document.title = seoTitle;
+    const og = document.getElementById("og-title");
+    if (og) og.setAttribute("content", seoTitle);
+    const heading = document.getElementById("page-heading");
+    if (heading) heading.textContent = seoTitle;
+  }
+  if (seoDescription) {
+    for (const id of ["meta-description", "og-description"]) {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute("content", seoDescription);
+    }
   }
   document.getElementById("site-tagline").textContent = SITE.tagline || "";
 }

@@ -3,14 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoZona.ge</title>
-  <meta name="description" content="ავტონაწილების კატალოგი — მოძებნე და გაფილტრე კატეგორიების მიხედვით">
+  <title>AutoZona.ge — ავტონაწილები და დისკები</title>
+  <meta name="description" id="meta-description"
+        content="ავტონაწილებისა და დისკების კატალოგი — მოძებნე ნაწილი კატეგორიის მიხედვით, ფოტოებითა და ფასებით.">
+  <link rel="canonical" href="https://autozona.ge/">
+
+  <!-- სოციალურ ქსელებში გაზიარებისთვის -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AutoZona.ge">
+  <meta property="og:title" id="og-title" content="AutoZona.ge — ავტონაწილები და დისკები">
+  <meta property="og:description" id="og-description"
+        content="ავტონაწილებისა და დისკების კატალოგი — ფოტოებითა და ფასებით.">
+  <meta property="og:url" content="https://autozona.ge/">
+  <meta property="og:image" content="https://autozona.ge/logo.png">
+  <meta property="og:locale" content="ka_GE">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=11">
-  <script src="theme.js?v=11"></script>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <script src="theme.js?v=12"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "AutoZona.ge",
+    "description": "ავტონაწილებისა და დისკების კატალოგი",
+    "url": "https://autozona.ge/",
+    "logo": "https://autozona.ge/logo.png",
+    "image": "https://autozona.ge/logo.png",
+    "areaServed": "GE"
+  }
+  </script>
 </head>
 <body>
 
@@ -32,6 +58,14 @@
   </header>
 
   <main class="wrap">
+
+    <h1 class="sr-only" id="page-heading">AutoZona.ge — ავტონაწილები და დისკები</h1>
+
+    <noscript>
+      <p class="noscript-note">
+        კატალოგის სანახავად ჩართე JavaScript.
+      </p>
+    </noscript>
 
     <section class="slider" id="slider" aria-label="ბანერები" hidden>
       <div class="slider-track" id="slider-track"></div>
@@ -75,8 +109,8 @@
     </div>
   </footer>
 
-  <script src="logo.js?v=11"></script>
+  <script src="logo.js?v=12"></script>
   <script src="data.js"></script>
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

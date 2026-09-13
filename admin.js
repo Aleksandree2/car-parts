@@ -10,7 +10,12 @@ const IMAGE_QUALITY = 0.82;
 
 // ── მდგომარეობა ──────────────────────────────────────
 const fromFile = () => ({
-  site: { title: SITE.title, tagline: SITE.tagline },
+  site: {
+    title: SITE.title,
+    tagline: SITE.tagline,
+    seoTitle: SITE.seoTitle || "",
+    seoDescription: SITE.seoDescription || "",
+  },
   slides: typeof SLIDES !== "undefined" ? SLIDES.map((s) => ({ ...s })) : [],
   categories: CATEGORIES.map((c) => ({ ...c, image: c.image || "" })),
   parts: PARTS.map((p) => ({ ...p })),
@@ -115,6 +120,36 @@ $("tabs").addEventListener("click", (e) => {
 // ── საიტის პარამეტრები ───────────────────────────────
 $("site-title").value = state.site.title || "";
 $("site-tagline").value = state.site.tagline || "";
+$("seo-title").value = state.site.seoTitle || "";
+$("seo-description").value = state.site.seoDescription || "";
+
+// Google სათაურს ~60, აღწერას ~160 სიმბოლოს შემდეგ ჭრის
+function seoCount(field, label, best) {
+  const n = $(field).value.length;
+  $(label).textContent = n
+    ? `${n} სიმბოლო${n > best ? ` — ${best}-ზე მეტი შეიძლება მოიჭრას` : ""}`
+    : "";
+  $(label).className = "panel-hint" + (n > best ? " bad" : "");
+}
+
+const updateSeoCounts = () => {
+  seoCount("seo-title", "seo-title-count", 60);
+  seoCount("seo-description", "seo-description-count", 160);
+};
+
+$("seo-title").addEventListener("input", (e) => {
+  state.site.seoTitle = e.target.value;
+  updateSeoCounts();
+  save();
+});
+
+$("seo-description").addEventListener("input", (e) => {
+  state.site.seoDescription = e.target.value;
+  updateSeoCounts();
+  save();
+});
+
+updateSeoCounts();
 
 $("site-title").addEventListener("input", (e) => {
   state.site.title = e.target.value;
@@ -1031,6 +1066,8 @@ function buildDataFile() {
 const SITE = {
   title: ${q(state.site.title)},
   tagline: ${q(state.site.tagline)},
+  seoTitle: ${q(state.site.seoTitle || "")},
+  seoDescription: ${q(state.site.seoDescription || "")},
 };
 
 // მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)

@@ -1,0 +1,8 @@
+# AutoZona.ge
+User-agent: *
+Allow: /
+
+# ბექოფისი საძიებოებს არ სჭირდებათ
+Disallow: /admin.html
+
+Sitemap: https://autozona.ge/sitemap.xml

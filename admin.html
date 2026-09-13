@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=11">
-  <link rel="stylesheet" href="admin.css?v=11">
-  <script src="theme.js?v=11"></script>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="admin.css?v=12">
+  <script src="theme.js?v=12"></script>
 </head>
 <body class="admin">
 
@@ -57,6 +57,27 @@
         <label for="site-tagline">ქვესათაური</label>
         <input type="text" id="site-tagline" maxlength="80" autocomplete="off"
                placeholder="ნაწილების კატალოგი">
+      </div>
+
+      <h2 class="panel-subtitle">საძიებო სისტემებისთვის</h2>
+      <p class="panel-hint">
+        ეს ტექსტი ჩანს Google-ის შედეგებში და სოციალურ ქსელებში
+        გაზიარებისას. კარგია, თუ ის სიტყვებია, რომლითაც შენს საქონელს
+        ეძებენ.
+      </p>
+
+      <div class="field">
+        <label for="seo-title">სათაური Google-ისთვის</label>
+        <input type="text" id="seo-title" maxlength="70" autocomplete="off"
+               placeholder="AutoZona.ge — ავტონაწილები და დისკები">
+        <p class="panel-hint" id="seo-title-count"></p>
+      </div>
+
+      <div class="field">
+        <label for="seo-description">აღწერა Google-ისთვის</label>
+        <textarea id="seo-description" rows="3" maxlength="200"
+                  placeholder="ავტონაწილებისა და დისკების კატალოგი — ფოტოებითა და ფასებით."></textarea>
+        <p class="panel-hint" id="seo-description-count"></p>
       </div>
     </section>
 
@@ -317,10 +338,10 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="logo.js?v=11"></script>
+  <script src="logo.js?v=12"></script>
   <script src="data.js"></script>
-  <script src="publish.js?v=11"></script>
-  <script src="import.js?v=11"></script>
-  <script src="admin.js?v=11"></script>
+  <script src="publish.js?v=12"></script>
+  <script src="import.js?v=12"></script>
+  <script src="admin.js?v=12"></script>
 </body>
 </html>
