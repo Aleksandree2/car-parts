@@ -14,13 +14,22 @@ const SITE = {
 // მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)
 const SLIDES = [
   {
-    image: "images/slide-mtxhpgfbhb3p.jpg",
+    image: "images/pasdakleba-mu37awit6gcu.jpg",
     title: "ფასდაკლება",
     link: "",
     align: "center",
-    size: "l",
+    size: "m",
     color: "#fa0000",
     overlay: 25,
+  },
+  {
+    image: "images/slide-mu37awitjmvg.jpg",
+    title: "",
+    link: "",
+    align: "center",
+    size: "m",
+    color: "#ffffff",
+    overlay: 35,
   },
 ];
 
