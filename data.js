@@ -481,4 +481,12 @@ const PARTS = [
     images: [],
     description: "",
   },
+  {
+    name: "Gggggg",
+    category: "dzrava",
+    price: 2500,
+    sale: 0,
+    images: [],
+    description: "",
+  },
 ];
