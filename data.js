@@ -110,4 +110,12 @@ const PARTS = [
     ],
     description: "RAYS Volk Racing Te37  \nR20 9.5 J   5.114.3 ET:30 MAT BLUE (CB:73.1)\nR20 10.5 J 5.114.3 ET:25 MAT BLUE (CB:73.1)",
   },
+  {
+    name: "საბურავი",
+    category: "saburavi",
+    price: 400,
+    sale: 0,
+    images: [],
+    description: "",
+  },
 ];
