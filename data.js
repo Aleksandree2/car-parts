@@ -22,6 +22,15 @@ const SLIDES = [
     color: "#fa0000",
     overlay: 25,
   },
+  {
+    image: "images/slide-mtxhtsmbsoyn.jpg",
+    title: "",
+    link: "",
+    align: "center",
+    size: "m",
+    color: "#ffffff",
+    overlay: 35,
+  },
 ];
 
 const CATEGORIES = [
@@ -41,8 +50,8 @@ const PARTS = [
   {
     name: "RAYS 5113 R18 9.5 J 10.5 J Dark Gunmetal",
     category: "diskebi",
-    price: 2200,
-    sale: 1800,
+    price: 2500,
+    sale: 2200,
     images: [
       "images/5113-lp95-r18-mtxewhmq0kzd.jpg",
     ],
@@ -51,8 +60,8 @@ const PARTS = [
   {
     name: "RAYS 5113 R18 9.5 J 10.5 J Mat Bronze",
     category: "diskebi",
-    price: 2200,
-    sale: 1800,
+    price: 2500,
+    sale: 2200,
     images: [
       "images/rays-5113-mat-bronze-r18-mtxfohpvf2oj.jpg",
     ],
@@ -61,8 +70,8 @@ const PARTS = [
   {
     name: "XH657 R19   9.5J 11J  Mat Black",
     category: "diskebi",
-    price: 2300,
-    sale: 1800,
+    price: 2700,
+    sale: 2500,
     images: [
       "images/xh657-r19-mat-black-mtxg3ql4lybg.jpg",
       "images/xh657-r19-mat-black-mtxg4dzex6g2.jpg",
@@ -73,7 +82,7 @@ const PARTS = [
     name: "TE37 R19 9.5 J 10.5 J Matt Bronze",
     category: "diskebi",
     price: 2500,
-    sale: 2200,
+    sale: 0,
     images: [
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hssr4.jpg",
       "images/te37-r19-9-5-j-10-5-j-ma-mtxhgq5hi8or.jpg",
@@ -83,8 +92,8 @@ const PARTS = [
   {
     name: "5825A BMW 5X120 R20 8.5 J 9.5 J",
     category: "diskebi",
-    price: 2600,
-    sale: 2300,
+    price: 2700,
+    sale: 1111,
     images: [
       "images/5825a-bmw-5x120-r20-8-5--mtxiltwohebm.jpg",
       "images/5825a-bmw-5x120-r20-8-5--mtxiltwp7smi.jpg",
@@ -468,14 +477,6 @@ const PARTS = [
     name: "英菲尼迪Q50 尾翼 FRP 7",
     category: "dzrava",
     price: 250,
-    sale: 0,
-    images: [],
-    description: "",
-  },
-  {
-    name: "rrrrrr",
-    category: "muxruchi",
-    price: 1111111111,
     sale: 0,
     images: [],
     description: "",
