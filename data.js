@@ -22,15 +22,6 @@ const SLIDES = [
     color: "#fa0000",
     overlay: 25,
   },
-  {
-    image: "images/slide-mtxhtsmbsoyn.jpg",
-    title: "",
-    link: "",
-    align: "center",
-    size: "m",
-    color: "#ffffff",
-    overlay: 35,
-  },
 ];
 
 const CATEGORIES = [
