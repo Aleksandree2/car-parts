@@ -14,16 +14,16 @@ const SITE = {
 // მთავარი გვერდის სლაიდერი (ბექოფისიდან იმართება)
 const SLIDES = [
   {
-    image: "images/pasdakleba-mu37awit6gcu.jpg",
-    title: "ფასდაკლება",
+    image: "images/slide-mtxhpgfbhb3p.jpg",
+    title: "",
     link: "",
     align: "center",
-    size: "m",
+    size: "l",
     color: "#fa0000",
     overlay: 25,
   },
   {
-    image: "images/slide-mu37awitjmvg.jpg",
+    image: "images/slide-mu37m9ru9d6u.jpg",
     title: "",
     link: "",
     align: "center",
@@ -44,15 +44,13 @@ const CATEGORIES = [
   { id: "dakidebis-sistema", name: "დაკიდების სისტემა", image: "" },
   { id: "dzara", name: "ძარა და ოპტიკა", image: "" },
   { id: "diskebi", name: "დისკები", image: "" },
-  { id: "dzravi-da-misi-natsilebi", name: "ძრავი და მისი ნაწილები", image: "" },
-  { id: "dzari-natsilebi", name: "ძარი ნაწილები", image: "" },
 ];
 
 const PARTS = [
   {
     name: "RAYS 5113 R18 9.5 J 10.5 J Dark Gunmetal",
     category: "diskebi",
-    price: 2200,
+    price: 5000,
     sale: 1800,
     images: [
       "images/5113-lp95-r18-mtxewhmq0kzd.jpg",
@@ -104,10 +102,10 @@ const PARTS = [
     description: "5825A R20X8.5 J 5X120 ET:25  MB (CB:72.6)\n5825A R20X9.5 J 5X120 ET:40  MB (CB:72.6)",
   },
   {
-    name: "lexus is 2013-2017",
-    category: "dzara",
-    price: 3150,
-    sale: 2350,
+    name: "lexus is 2013-2017 雷克萨斯isMBJ 机盖",
+    category: "dzrava",
+    price: 900,
+    sale: 0,
     images: [
       "images/lexus-is-2013-2017-ismbj-mtybyyzfdpxd.jpg",
       "images/lexus-is-2013-2017-ismbj-mtybyyzfs7lb.jpg",
@@ -115,10 +113,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "lexus GS 2012-2018",
+    name: "lexus GS 2012-2018 雷克萨斯GS改GSF机盖",
     category: "dzrava",
-    price: 3150,
-    sale: 2150,
+    price: 900,
+    sale: 0,
     images: [
       "images/lexus-gs-2012-2018-gs-gs-mtybyyzfsqda.jpg",
       "images/lexus-gs-2012-2018-gs-gs-mtybyyzfc8sx.jpg",
@@ -126,10 +124,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "LEXUS is 2013-2017",
+    name: "LEXUS is 2013-2017 雷克萨斯isMBJ 机盖",
     category: "dzrava",
-    price: 3150,
-    sale: 2350,
+    price: 900,
+    sale: 0,
     images: [
       "images/lexus-is-2013-2017-ismbj-mtybyyzf5btm.jpg",
       "images/lexus-is-2013-2017-ismbj-mtybyyzffke1.jpg",
@@ -137,10 +135,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "lexus ct200 2011-2022",
+    name: "lexus ct200 2011-2022 雷克萨斯CT200MBJ机盖",
     category: "dzrava",
-    price: 2600,
-    sale: 1850,
+    price: 900,
+    sale: 0,
     images: [
       "images/lexus-ct200-2011-2022-ct-mtybyyzfwmtl.jpg",
       "images/lexus-ct200-2011-2022-ct-mtybyyzfnbbz.jpg",
@@ -148,10 +146,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "lexus nx",
+    name: "lexus nx 雷克萨斯NX改MB就机盖",
     category: "dzrava",
-    price: 3150,
-    sale: 2350,
+    price: 900,
+    sale: 0,
     images: [
       "images/lexus-nx-nx-mb-mtybyyzf71ft.jpg",
       "images/lexus-nx-nx-mb-mtybyyzftihc.jpg",
@@ -479,6 +477,14 @@ const PARTS = [
     name: "英菲尼迪Q50 尾翼 FRP 7",
     category: "dzrava",
     price: 250,
+    sale: 0,
+    images: [],
+    description: "",
+  },
+  {
+    name: "rrrrrr",
+    category: "muxruchi",
+    price: 1111111111,
     sale: 0,
     images: [],
     description: "",
