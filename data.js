@@ -35,13 +35,15 @@ const CATEGORIES = [
   { id: "dakidebis-sistema", name: "დაკიდების სისტემა", image: "" },
   { id: "dzara", name: "ძარა და ოპტიკა", image: "" },
   { id: "diskebi", name: "დისკები", image: "" },
+  { id: "dzravi-da-misi-natsilebi", name: "ძრავი და მისი ნაწილები", image: "" },
+  { id: "dzari-natsilebi", name: "ძარი ნაწილები", image: "" },
 ];
 
 const PARTS = [
   {
     name: "RAYS 5113 R18 9.5 J 10.5 J Dark Gunmetal",
     category: "diskebi",
-    price: 5000,
+    price: 2200,
     sale: 1800,
     images: [
       "images/5113-lp95-r18-mtxewhmq0kzd.jpg",
@@ -93,10 +95,10 @@ const PARTS = [
     description: "5825A R20X8.5 J 5X120 ET:25  MB (CB:72.6)\n5825A R20X9.5 J 5X120 ET:40  MB (CB:72.6)",
   },
   {
-    name: "lexus is 2013-2017 雷克萨斯isMBJ 机盖",
-    category: "dzrava",
-    price: 900,
-    sale: 0,
+    name: "lexus is 2013-2017",
+    category: "dzara",
+    price: 3150,
+    sale: 2350,
     images: [
       "images/lexus-is-2013-2017-ismbj-mtybyyzfdpxd.jpg",
       "images/lexus-is-2013-2017-ismbj-mtybyyzfs7lb.jpg",
@@ -104,10 +106,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "lexus GS 2012-2018 雷克萨斯GS改GSF机盖",
+    name: "lexus GS 2012-2018",
     category: "dzrava",
-    price: 900,
-    sale: 0,
+    price: 3150,
+    sale: 2150,
     images: [
       "images/lexus-gs-2012-2018-gs-gs-mtybyyzfsqda.jpg",
       "images/lexus-gs-2012-2018-gs-gs-mtybyyzfc8sx.jpg",
@@ -115,10 +117,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "LEXUS is 2013-2017 雷克萨斯isMBJ 机盖",
+    name: "LEXUS is 2013-2017",
     category: "dzrava",
-    price: 900,
-    sale: 0,
+    price: 3150,
+    sale: 2350,
     images: [
       "images/lexus-is-2013-2017-ismbj-mtybyyzf5btm.jpg",
       "images/lexus-is-2013-2017-ismbj-mtybyyzffke1.jpg",
@@ -126,10 +128,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "lexus ct200 2011-2022 雷克萨斯CT200MBJ机盖",
+    name: "lexus ct200 2011-2022",
     category: "dzrava",
-    price: 900,
-    sale: 0,
+    price: 2600,
+    sale: 1850,
     images: [
       "images/lexus-ct200-2011-2022-ct-mtybyyzfwmtl.jpg",
       "images/lexus-ct200-2011-2022-ct-mtybyyzfnbbz.jpg",
@@ -137,10 +139,10 @@ const PARTS = [
     description: "",
   },
   {
-    name: "lexus nx 雷克萨斯NX改MB就机盖",
+    name: "lexus nx",
     category: "dzrava",
-    price: 900,
-    sale: 0,
+    price: 3150,
+    sale: 2350,
     images: [
       "images/lexus-nx-nx-mb-mtybyyzf71ft.jpg",
       "images/lexus-nx-nx-mb-mtybyyzftihc.jpg",
